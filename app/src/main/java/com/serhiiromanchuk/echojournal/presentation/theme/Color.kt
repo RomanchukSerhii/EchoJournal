@@ -1,4 +1,4 @@
-package com.serhiiromanchuk.echojournal.ui.theme
+package com.serhiiromanchuk.echojournal.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 

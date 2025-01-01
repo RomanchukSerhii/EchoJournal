@@ -1,4 +1,4 @@
-package com.serhiiromanchuk.echojournal
+package com.serhiiromanchuk.echojournal.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,7 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.serhiiromanchuk.echojournal.ui.theme.EchoJournalTheme
+import com.serhiiromanchuk.echojournal.presentation.theme.EchoJournalTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -1,4 +1,4 @@
-package com.serhiiromanchuk.echojournal.ui.theme
+package com.serhiiromanchuk.echojournal.presentation.theme
 
 import android.app.Activity
 import android.os.Build
