@@ -13,6 +13,7 @@ private val LightColorScheme = lightColorScheme(
     primary = EchoBlue,
     background = EchoLightBlue,
     surface = Color.White,
+    surfaceVariant = EchoExtraLightGray,
     onPrimary = Color.White,
     onSurface = EchoDark,
     onSurfaceVariant = EchoGrayBlue,

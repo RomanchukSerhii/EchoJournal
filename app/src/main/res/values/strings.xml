@@ -5,4 +5,5 @@
     <string name="your_echojournal">Your EchoJournal</string>
     <string name="no_entries">No Entries</string>
     <string name="start_screen_supporting_text">Start recording your first Echo</string>
+    <string name="clear_filter">Clear filter</string>
 </resources>

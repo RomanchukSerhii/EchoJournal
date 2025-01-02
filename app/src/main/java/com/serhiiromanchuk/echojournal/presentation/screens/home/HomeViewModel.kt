@@ -3,7 +3,7 @@ package com.serhiiromanchuk.echojournal.presentation.screens.home
 import com.serhiiromanchuk.echojournal.presentation.core.base.BaseViewModel
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeActionEvent
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent
-import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiState
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
