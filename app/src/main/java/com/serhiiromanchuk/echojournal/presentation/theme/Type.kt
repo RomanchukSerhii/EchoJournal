@@ -31,6 +31,12 @@ val Typography = Typography(
         fontSize = 12.sp,
         color = EchoGrayBlue
     ),
+    labelLarge = TextStyle(
+        fontFamily = Inter,
+        fontWeight = FontWeight.Medium,
+        fontSize = 12.sp,
+        color = EchoGrayBlue
+    ),
     bodySmall = TextStyle(
         fontFamily = Inter,
         fontWeight = FontWeight.Medium,

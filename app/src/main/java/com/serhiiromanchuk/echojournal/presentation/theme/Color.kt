@@ -10,6 +10,7 @@ val EchoDarkSteel = Color(0xFF3B4663)
 val EchoMutedGray = Color(0xFF6C7085)
 val EchoLightGray = Color(0xFFC1C3CE)
 val EchoExtraLightGray = Color(0xFFF6F7F9)
+val EchoUltraLightGray = Color(0xFFF2F2F7)
 
 val MoodNeutral35 = Color(0xFF41B278)
 val MoodNeutral80 = Color(0xFFB9DDCB)
@@ -30,3 +31,5 @@ val MoodExcited95 = Color(0xFFF5F2EF)
 val MoodStressed35 = Color(0xFFDE3A3A)
 val MoodStressed80 = Color(0xFFE9C5C5)
 val MoodStressed95 = Color(0xFFF8EFEF)
+
+val NeutralVariant90 = Color(0xFFDFE2E8)

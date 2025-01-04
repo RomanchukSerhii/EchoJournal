@@ -1,5 +1,6 @@
 package com.serhiiromanchuk.echojournal.presentation.screens.home
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -14,7 +15,9 @@ import com.serhiiromanchuk.echojournal.R
 import com.serhiiromanchuk.echojournal.presentation.core.base.BaseContentLayout
 import com.serhiiromanchuk.echojournal.presentation.core.components.EchoFAB
 import com.serhiiromanchuk.echojournal.presentation.core.components.EchoTopBar
-import com.serhiiromanchuk.echojournal.presentation.screens.home.components.EmptyScreen
+import com.serhiiromanchuk.echojournal.presentation.screens.home.components.EchoFilter
+import com.serhiiromanchuk.echojournal.presentation.screens.home.components.EmptyHomeScreen
+import com.serhiiromanchuk.echojournal.presentation.screens.home.components.JournalEntries
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.HomeUiState
 
@@ -23,7 +26,7 @@ fun HomeScreenRoot(modifier: Modifier = Modifier) {
     val viewModel: HomeViewModel = hiltViewModel()
 
     BaseContentLayout(
-        modifier = modifier,
+        modifier = modifier.padding(horizontal = 16.dp),
         viewModel = viewModel,
         topBar = {
             EchoTopBar(
@@ -43,10 +46,14 @@ fun HomeScreenRoot(modifier: Modifier = Modifier) {
             }
         }
     ) { uiState ->
-        HomeScreen(
-            uiState = uiState,
-            onEvent = {}
-        )
+        if (uiState.entries.isEmpty()) {
+            EmptyHomeScreen(modifier = Modifier.padding(16.dp))
+        } else {
+            HomeScreen(
+                uiState = uiState,
+                onEvent = viewModel::onEvent
+            )
+        }
     }
 }
 
@@ -55,7 +62,14 @@ private fun HomeScreen(
     uiState: HomeUiState,
     onEvent: (HomeUiEvent) -> Unit
 ) {
-    if (uiState.echos.isEmpty()) {
-        EmptyScreen(modifier = Modifier.padding(16.dp))
+    Column {
+        EchoFilter(
+            filterState = uiState.filterState,
+            onEvent = onEvent
+        )
+        JournalEntries(
+            entryNotes = uiState.entries,
+            onEvent = onEvent
+        )
     }
 }

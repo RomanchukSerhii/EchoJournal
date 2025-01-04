@@ -132,21 +132,18 @@ private fun FilterChip(
             )
         },
         trailingIcon = {
-            IconButton(
-                modifier = Modifier.size(18.dp),
-                onClick = {}
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Clear,
-                    contentDescription = stringResource(R.string.clear_filter),
-                    tint = MaterialTheme.colorScheme.secondary
-                )
+            if (isSelected) {
+                IconButton(
+                    modifier = Modifier.size(18.dp),
+                    onClick = {}
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Clear,
+                        contentDescription = stringResource(R.string.clear_filter),
+                        tint = MaterialTheme.colorScheme.secondary
+                    )
+                }
             }
-
-            if (!isSelected) {
-
-            }
-
         },
         enabled = enabled,
         leadingIcon = leadingIcon,

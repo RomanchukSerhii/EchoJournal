@@ -29,7 +29,7 @@ fun EchoTopBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(64.dp)
+            .height(48.dp)
             .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 16.dp)
     ) {
