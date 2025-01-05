@@ -19,7 +19,10 @@ private val LightColorScheme = lightColorScheme(
     onSurfaceVariant = EchoGrayBlue,
     secondary = EchoDarkSteel,
     outline = EchoMutedGray,
-    outlineVariant = EchoLightGray
+    outlineVariant = EchoLightGray,
+    errorContainer = EchoSoftPeach,
+    onErrorContainer = EchoRed,
+    onPrimaryContainer = EchoPaleBlue
 )
 
 @Composable
@@ -34,7 +37,7 @@ fun EchoJournalTheme(
             val window = (view.context as Activity).window
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                window.isNavigationBarContrastEnforced = false
+                window.isNavigationBarContrastEnforced = true
             }
         }
     }

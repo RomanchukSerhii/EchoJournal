@@ -1,8 +1,6 @@
-@file:OptIn(ExperimentalFoundationApi::class)
 
 package com.serhiiromanchuk.echojournal.presentation.screens.home.components
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn

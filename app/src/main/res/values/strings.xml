@@ -7,4 +7,9 @@
     <string name="start_screen_supporting_text">Start recording your first Echo</string>
     <string name="clear_filter">Clear filter</string>
     <string name="play_button">Play button</string>
+    <string name="recording_paused">Recording paused</string>
+    <string name="recording_your_memories">Recording your memories…</string>
+    <string name="cancel_recording">Cancel recording</string>
+    <string name="recording_button">Recording button</string>
+    <string name="pause_button">Pause button</string>
 </resources>

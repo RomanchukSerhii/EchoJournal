@@ -18,7 +18,9 @@ import com.serhiiromanchuk.echojournal.presentation.core.components.EchoTopBar
 import com.serhiiromanchuk.echojournal.presentation.screens.home.components.EchoFilter
 import com.serhiiromanchuk.echojournal.presentation.screens.home.components.EmptyHomeScreen
 import com.serhiiromanchuk.echojournal.presentation.screens.home.components.JournalEntries
+import com.serhiiromanchuk.echojournal.presentation.screens.home.components.RecordingBottomSheet
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.BottomSheetState
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.HomeUiState
 
 @Composable
@@ -36,7 +38,9 @@ fun HomeScreenRoot(modifier: Modifier = Modifier) {
         },
         floatingActionButton = {
             EchoFAB(
-                onClick = {}
+                onClick = {
+                    viewModel.onEvent(HomeUiEvent.BottomSheetStateChanged(BottomSheetState.Recording()))
+                }
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -51,6 +55,10 @@ fun HomeScreenRoot(modifier: Modifier = Modifier) {
         } else {
             HomeScreen(
                 uiState = uiState,
+                onEvent = viewModel::onEvent
+            )
+            RecordingBottomSheet(
+                bottomSheetState = uiState.bottomSheetState,
                 onEvent = viewModel::onEvent
             )
         }

@@ -247,25 +247,23 @@ private fun MoodTimeline(
     iconTopPadding: Dp = 16.dp,
     iconEndPadding: Dp = 12.dp
 ) {
-    // State to store the height of the element (Box) for later use
     var elementHeight by remember { mutableIntStateOf(0) }
-
-    // State to store the size of the mood image (icon)
     var moodSize by remember { mutableStateOf(IntSize.Zero) }
 
     // Derived state for the middle vertical offset of the mood icon, calculated based on its size and top padding
-    val middleMoodOffsetY by remember(moodSize) {
+    val middleMoodOffsetY by remember {
         derivedStateOf {
             iconTopPadding.value.toInt() + moodSize.height / 2
         }
     }
+
     // Derived state for the horizontal offset (X position) of the divider, calculated from the mood icon width
-    val dividerOffsetX by remember(moodSize) {
+    val dividerOffsetX by remember {
         derivedStateOf { moodSize.width / 2 }
     }
 
     // Derived state for the vertical offset (Y position) of the divider, adjusted based on the entry position
-    val dividerOffsetY by remember(middleMoodOffsetY) {
+    val dividerOffsetY by remember {
         derivedStateOf {
             // For 'Last' or 'Middle' entries, the divider starts at the top; for 'First', it starts lower
             if (entryPosition == EntryListPosition.Last ||
@@ -275,7 +273,7 @@ private fun MoodTimeline(
     }
 
     // Derived state for the height of the vertical divider, calculated based on the entry position and element height
-    val dividerHeight by remember(entryPosition, elementHeight, moodSize) {
+    val dividerHeight by remember {
         derivedStateOf {
             // The height is adjusted based on the entry's position in the list
             when (entryPosition) {

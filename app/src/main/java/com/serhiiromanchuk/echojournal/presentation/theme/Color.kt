@@ -3,6 +3,7 @@ package com.serhiiromanchuk.echojournal.presentation.theme
 import androidx.compose.ui.graphics.Color
 
 val EchoLightBlue = Color(0xFFF2F5FF)
+val EchoPaleBlue = Color(0xFFEEF0FF)
 val EchoBlue = Color(0xFF00419C)
 val EchoDark = Color(0xFF191A20)
 val EchoGrayBlue = Color(0xFF40434F)
@@ -11,6 +12,8 @@ val EchoMutedGray = Color(0xFF6C7085)
 val EchoLightGray = Color(0xFFC1C3CE)
 val EchoExtraLightGray = Color(0xFFF6F7F9)
 val EchoUltraLightGray = Color(0xFFF2F2F7)
+val EchoRed = Color(0xFF680014)
+val EchoSoftPeach = Color(0xFFFFEDEC)
 
 val MoodNeutral35 = Color(0xFF41B278)
 val MoodNeutral80 = Color(0xFFB9DDCB)

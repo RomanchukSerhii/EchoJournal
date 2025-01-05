@@ -28,6 +28,20 @@ class HomeViewModel @Inject constructor() : BaseHomeViewModel() {
             Pair(
                 today, listOf(
                     Entry(
+                        id = 7L,
+                        title = "MyEntry",
+                        moodType = MoodType.Peaceful,
+                        topics = listOf("Work", "Conundrums"),
+                        creationTimestamp = today
+                    ),
+                    Entry(
+                        id = 6L,
+                        title = "MyEntry",
+                        moodType = MoodType.Peaceful,
+                        topics = listOf("Work", "Conundrums"),
+                        creationTimestamp = today
+                    ),
+                    Entry(
                         id = 5L,
                         title = "MyEntry",
                         moodType = MoodType.Peaceful,
@@ -85,6 +99,8 @@ class HomeViewModel @Inject constructor() : BaseHomeViewModel() {
     }
 
     override fun onEvent(event: HomeUiEvent) {
-        TODO("Not yet implemented")
+        when (event) {
+            is HomeUiEvent.BottomSheetStateChanged -> updateState { it.copy(bottomSheetState = event.bottomSheetState) }
+        }
     }
 }
