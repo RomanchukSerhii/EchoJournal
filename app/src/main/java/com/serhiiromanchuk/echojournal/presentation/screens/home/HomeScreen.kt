@@ -12,6 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.serhiiromanchuk.echojournal.R
+import com.serhiiromanchuk.echojournal.navigation.NavigationState
 import com.serhiiromanchuk.echojournal.presentation.core.base.BaseContentLayout
 import com.serhiiromanchuk.echojournal.presentation.core.components.EchoFAB
 import com.serhiiromanchuk.echojournal.presentation.core.components.EchoTopBar
@@ -24,7 +25,10 @@ import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.HomeUiState
 
 @Composable
-fun HomeScreenRoot(modifier: Modifier = Modifier) {
+fun HomeScreenRoot(
+    modifier: Modifier = Modifier,
+    navigationState: NavigationState
+) {
     val viewModel: HomeViewModel = hiltViewModel()
 
     BaseContentLayout(
