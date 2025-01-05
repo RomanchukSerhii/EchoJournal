@@ -5,15 +5,16 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -65,22 +66,26 @@ fun <S : UiState, E : UiEvent, A : ActionEvent> BaseContentLayout(
         onBack = { onBackPressed?.invoke() }
     )
 
-    Scaffold(
-        modifier = Modifier
-            .windowInsetsPadding(WindowInsets.safeDrawing)
-            .fillMaxWidth()
-            .wrapContentHeight(),
-        topBar = { topBar(uiState) },
-        bottomBar = { bottomBar(uiState) },
-        snackbarHost = snackbarHost,
-        floatingActionButton = floatingActionButton,
-        floatingActionButtonPosition = floatingActionButtonPosition,
-        containerColor = containerColor,
-        contentColor = contentColor,
-        contentWindowInsets = contentWindowInsets,
-    ) { paddingValues ->
-        Box(modifier = modifier.padding(paddingValues)) {
-            content(uiState)
+    Surface (
+        modifier = Modifier.fillMaxSize(),
+        color = containerColor
+    ) {
+        Scaffold(
+            modifier = Modifier
+                .windowInsetsPadding(WindowInsets.safeDrawing)
+                .fillMaxWidth(),
+            topBar = { topBar(uiState) },
+            bottomBar = { bottomBar(uiState) },
+            snackbarHost = snackbarHost,
+            floatingActionButton = floatingActionButton,
+            floatingActionButtonPosition = floatingActionButtonPosition,
+            containerColor = containerColor,
+            contentColor = contentColor,
+            contentWindowInsets = contentWindowInsets,
+        ) { paddingValues ->
+            Box(modifier = modifier.padding(paddingValues)) {
+                content(uiState)
+            }
         }
     }
 }

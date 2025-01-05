@@ -12,4 +12,12 @@
     <string name="cancel_recording">Cancel recording</string>
     <string name="recording_button">Recording button</string>
     <string name="pause_button">Pause button</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="edit_entry">Edit Entry</string>
+    <string name="new_entry">New Entry</string>
+    <string name="choose_mood">Choose Mood</string>
+    <string name="add_title">Add Title…</string>
+    <string name="topic">Topic</string>
+    <string name="add_description">Add Description</string>
 </resources>

@@ -18,6 +18,10 @@ import com.serhiiromanchuk.echojournal.presentation.theme.MoodSad95
 import com.serhiiromanchuk.echojournal.presentation.theme.MoodStressed35
 import com.serhiiromanchuk.echojournal.presentation.theme.MoodStressed80
 import com.serhiiromanchuk.echojournal.presentation.theme.MoodStressed95
+import com.serhiiromanchuk.echojournal.presentation.theme.MoodUndefined35
+import com.serhiiromanchuk.echojournal.presentation.theme.MoodUndefined80
+import com.serhiiromanchuk.echojournal.presentation.theme.MoodUndefined95
+import com.serhiiromanchuk.echojournal.utils.Constants
 
 data class MoodColor(
     val button: Color,
@@ -33,6 +37,7 @@ object MoodProvider {
             MoodType.Peaceful -> R.drawable.ic_peaceful_mood
             MoodType.Sad -> R.drawable.ic_sad_mood
             MoodType.Stressed -> R.drawable.ic_stressed_mood
+            MoodType.Undefined -> Constants.UNDEFINED_MOOD_TYPE_ICON
         }
     }
 
@@ -62,6 +67,12 @@ object MoodProvider {
                 button = MoodStressed35,
                 track = MoodStressed80,
                 background = MoodStressed95
+            )
+
+            MoodType.Undefined -> MoodColor(
+                button = MoodUndefined35,
+                track = MoodUndefined80,
+                background = MoodUndefined95
             )
         }
     }

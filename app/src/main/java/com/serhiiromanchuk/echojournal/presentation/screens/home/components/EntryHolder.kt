@@ -5,7 +5,6 @@ package com.serhiiromanchuk.echojournal.presentation.screens.home.components
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,13 +18,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -44,7 +39,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -53,10 +47,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import com.serhiiromanchuk.echojournal.R
 import com.serhiiromanchuk.echojournal.domain.entity.Entry
-import com.serhiiromanchuk.echojournal.domain.entity.MoodType
 import com.serhiiromanchuk.echojournal.presentation.core.components.ExpandableText
+import com.serhiiromanchuk.echojournal.presentation.core.components.MoodPlayer
 import com.serhiiromanchuk.echojournal.presentation.core.utils.MoodProvider
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent
 import com.serhiiromanchuk.echojournal.presentation.theme.EchoUltraLightGray
@@ -99,7 +92,7 @@ fun EntryHolder(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                EntryPlayer(
+                MoodPlayer(
                     moodType = entry.moodType,
                     onPlayClick = {}
                 )
@@ -154,54 +147,6 @@ private fun EntryHeader(
             text = creationTime,
             style = MaterialTheme.typography.labelMedium
         )
-    }
-}
-
-@Composable
-private fun EntryPlayer(
-    modifier: Modifier = Modifier,
-    moodType: MoodType,
-    onPlayClick: () -> Unit
-) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = CircleShape,
-        color = MoodProvider.getMoodColor(moodType).background
-    ) {
-        Row(
-            modifier = Modifier.padding(4.dp),
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            // Play button
-            Surface(
-                modifier = Modifier
-                    .size(32.dp)
-                    .clickable { onPlayClick() },
-                shape = CircleShape,
-                shadowElevation = 4.dp
-            ) {
-                Icon(
-                    imageVector = Icons.Default.PlayArrow,
-                    contentDescription = stringResource(R.string.play_button),
-                    tint = MoodProvider.getMoodColor(moodType).button
-                )
-            }
-
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .height(4.dp)
-                    .background(MoodProvider.getMoodColor(moodType).track, CircleShape)
-            )
-
-            Text(
-                modifier = Modifier.padding(end = 4.dp),
-                text = "0:00/12:30",
-                style = MaterialTheme.typography.labelMedium
-            )
-        }
     }
 }
 

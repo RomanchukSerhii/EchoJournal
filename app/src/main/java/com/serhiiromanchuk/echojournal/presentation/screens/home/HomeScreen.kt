@@ -15,13 +15,12 @@ import com.serhiiromanchuk.echojournal.R
 import com.serhiiromanchuk.echojournal.navigation.NavigationState
 import com.serhiiromanchuk.echojournal.presentation.core.base.BaseContentLayout
 import com.serhiiromanchuk.echojournal.presentation.core.components.EchoFAB
-import com.serhiiromanchuk.echojournal.presentation.core.components.EchoTopBar
 import com.serhiiromanchuk.echojournal.presentation.screens.home.components.EchoFilter
 import com.serhiiromanchuk.echojournal.presentation.screens.home.components.EmptyHomeScreen
+import com.serhiiromanchuk.echojournal.presentation.screens.home.components.HomeTopBar
 import com.serhiiromanchuk.echojournal.presentation.screens.home.components.JournalEntries
 import com.serhiiromanchuk.echojournal.presentation.screens.home.components.RecordingBottomSheet
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent
-import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.BottomSheetState
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.HomeUiState
 
 @Composable
@@ -32,10 +31,10 @@ fun HomeScreenRoot(
     val viewModel: HomeViewModel = hiltViewModel()
 
     BaseContentLayout(
-        modifier = modifier.padding(horizontal = 16.dp),
+        modifier = modifier,
         viewModel = viewModel,
         topBar = {
-            EchoTopBar(
+            HomeTopBar(
                 title = stringResource(R.string.your_echojournal),
                 onSettingsClick = {}
             )
@@ -43,7 +42,8 @@ fun HomeScreenRoot(
         floatingActionButton = {
             EchoFAB(
                 onClick = {
-                    viewModel.onEvent(HomeUiEvent.BottomSheetStateChanged(BottomSheetState.Recording()))
+                    navigationState.navigateToEntry("")
+//                    viewModel.onEvent(HomeUiEvent.BottomSheetStateChanged(BottomSheetState.Recording()))
                 }
             ) {
                 Icon(

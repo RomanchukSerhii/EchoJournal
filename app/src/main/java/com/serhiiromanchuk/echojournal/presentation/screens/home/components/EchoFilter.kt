@@ -108,9 +108,9 @@ private fun FilterChip(
     isSelected: Boolean,
     onClick: () -> Unit,
     onClearClick: () -> Unit,
+    modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    leadingIcon: @Composable (() -> Unit)? = null,
-    modifier: Modifier = Modifier
+    leadingIcon: @Composable (() -> Unit)? = null
 ) {
     AssistChip(
         onClick = onClick,
@@ -145,9 +145,9 @@ private fun FilterChip(
                 }
             }
         },
+        modifier = modifier,
         enabled = enabled,
-        leadingIcon = leadingIcon,
-        modifier = modifier
+        leadingIcon = leadingIcon
     )
 }
 
@@ -193,7 +193,9 @@ fun FilterItem(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
-        color = if (filterItem.isChecked) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface
+        color = if (filterItem.isChecked) {
+            MaterialTheme.colorScheme.surfaceTint.copy(alpha = 0.05f)
+        } else MaterialTheme.colorScheme.surface
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),

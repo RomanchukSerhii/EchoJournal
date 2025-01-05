@@ -13,7 +13,7 @@ private val LightColorScheme = lightColorScheme(
     primary = EchoBlue,
     background = EchoLightBlue,
     surface = Color.White,
-    surfaceVariant = EchoExtraLightGray,
+    surfaceVariant = EchoSofBlue,
     onPrimary = Color.White,
     onSurface = EchoDark,
     onSurfaceVariant = EchoGrayBlue,
@@ -22,7 +22,8 @@ private val LightColorScheme = lightColorScheme(
     outlineVariant = EchoLightGray,
     errorContainer = EchoSoftPeach,
     onErrorContainer = EchoRed,
-    onPrimaryContainer = EchoPaleBlue
+    onPrimaryContainer = EchoPaleBlue,
+    surfaceTint = EchoDeepBlue
 )
 
 @Composable
@@ -37,7 +38,7 @@ fun EchoJournalTheme(
             val window = (view.context as Activity).window
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                window.isNavigationBarContrastEnforced = true
+                window.isNavigationBarContrastEnforced = false
             }
         }
     }
