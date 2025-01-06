@@ -8,4 +8,7 @@ sealed interface EntryUiEvent : UiEvent {
     data class BottomSheetOpened(val mood: MoodUiModel) : EntryUiEvent
     data class MoodSelected(val mood: MoodUiModel) : EntryUiEvent
     data class SheetConfirmedClicked(val mood: MoodUiModel) : EntryUiEvent
+    data class TitleChanged(val title: String) : EntryUiEvent
+    data class TopicChanged(val topic: String) : EntryUiEvent
+    data class DescriptionChanged(val description: String) : EntryUiEvent
 }

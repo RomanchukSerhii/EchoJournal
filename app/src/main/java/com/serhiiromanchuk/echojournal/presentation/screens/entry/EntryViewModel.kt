@@ -4,6 +4,7 @@ import com.serhiiromanchuk.echojournal.presentation.core.base.BaseViewModel
 import com.serhiiromanchuk.echojournal.presentation.core.utils.MoodUiModel
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryActionEvent
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.*
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.state.EntrySheetState
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.state.EntryUiState
 import dagger.assisted.Assisted
@@ -23,15 +24,17 @@ class EntryViewModel @AssistedInject constructor(
 
     override fun onEvent(event: EntryUiEvent) {
         when (event) {
-            EntryUiEvent.BottomSheetClosed -> updateState {
+            BottomSheetClosed -> updateState {
                 it.copy(entrySheetState = toggleSheetState(currentState.entrySheetState))
             }
-
-            is EntryUiEvent.BottomSheetOpened -> updateState {
+            is BottomSheetOpened -> updateState {
                 it.copy(entrySheetState = toggleSheetState(currentState.entrySheetState, event.mood))
             }
-            is EntryUiEvent.MoodSelected -> updateActiveMood(event.mood)
-            is EntryUiEvent.SheetConfirmedClicked -> setCurrentMood(event.mood)
+            is MoodSelected -> updateActiveMood(event.mood)
+            is SheetConfirmedClicked -> setCurrentMood(event.mood)
+            is TitleChanged -> updateState { it.copy(title = event.title) }
+            is TopicChanged -> updateState { it.copy(topic = event.topic) }
+            is DescriptionChanged -> updateState { it.copy(description = event.description) }
         }
     }
 
