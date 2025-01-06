@@ -69,7 +69,7 @@ fun EntryHolder(
     ) {
         // Mood icon
         MoodTimeline(
-            moodRes = moodUiModel.moodIcon.fillIcon,
+            moodRes = moodUiModel.moodIcons.fill,
             entryPosition = entryPosition,
             modifier = Modifier.fillMaxHeight()
         )

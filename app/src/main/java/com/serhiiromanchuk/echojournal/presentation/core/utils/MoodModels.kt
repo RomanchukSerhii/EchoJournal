@@ -18,20 +18,23 @@ import com.serhiiromanchuk.echojournal.presentation.theme.MoodSad95
 import com.serhiiromanchuk.echojournal.presentation.theme.MoodStressed35
 import com.serhiiromanchuk.echojournal.presentation.theme.MoodStressed80
 import com.serhiiromanchuk.echojournal.presentation.theme.MoodStressed95
+import com.serhiiromanchuk.echojournal.presentation.theme.MoodUndefined35
+import com.serhiiromanchuk.echojournal.presentation.theme.MoodUndefined80
+import com.serhiiromanchuk.echojournal.presentation.theme.MoodUndefined95
 import com.serhiiromanchuk.echojournal.utils.Constants
 
 @Stable
 sealed class MoodUiModel(
     val title: String,
-    val moodIcon: MoodIcon,
+    val moodIcons: MoodIcons,
     val moodColor: MoodColor,
 ) {
     data object Excited : MoodUiModel(
         title = "Excited",
-        moodIcon = MoodIcon(
-            fillIcon = R.drawable.ic_excited_mood,
-            strokeIcon = R.drawable.ic_excited_stroke,
-            outlineIcon = R.drawable.ic_excited_outline
+        moodIcons = MoodIcons(
+            fill = R.drawable.ic_excited_mood,
+            stroke = R.drawable.ic_excited_stroke,
+            outline = R.drawable.ic_excited_outline
         ),
         moodColor = MoodColor(
             button = MoodExcited35,
@@ -42,10 +45,10 @@ sealed class MoodUiModel(
 
     data object Neutral : MoodUiModel(
         title = "Neutral",
-        moodIcon = MoodIcon(
-            fillIcon = R.drawable.ic_neutral_mood,
-            strokeIcon = R.drawable.ic_neutral_stroke,
-            outlineIcon = R.drawable.ic_neutral_outline
+        moodIcons = MoodIcons(
+            fill = R.drawable.ic_neutral_mood,
+            stroke = R.drawable.ic_neutral_stroke,
+            outline = R.drawable.ic_neutral_outline
         ),
         moodColor = MoodColor(
             button = MoodNeutral35,
@@ -56,10 +59,10 @@ sealed class MoodUiModel(
 
     data object Peaceful : MoodUiModel(
         title = "Peaceful",
-        moodIcon = MoodIcon(
-            fillIcon = R.drawable.ic_peaceful_mood,
-            strokeIcon = R.drawable.ic_peaceful_stroke,
-            outlineIcon = R.drawable.ic_peaceful_outline
+        moodIcons = MoodIcons(
+            fill = R.drawable.ic_peaceful_mood,
+            stroke = R.drawable.ic_peaceful_stroke,
+            outline = R.drawable.ic_peaceful_outline
         ),
         moodColor = MoodColor(
             button = MoodPeaceful35,
@@ -70,10 +73,10 @@ sealed class MoodUiModel(
 
     data object Sad : MoodUiModel(
         title = "Sad",
-        moodIcon = MoodIcon(
-            fillIcon = R.drawable.ic_sad_mood,
-            strokeIcon = R.drawable.ic_sad_stroke,
-            outlineIcon = R.drawable.ic_sad_outline
+        moodIcons = MoodIcons(
+            fill = R.drawable.ic_sad_mood,
+            stroke = R.drawable.ic_sad_stroke,
+            outline = R.drawable.ic_sad_outline
         ),
         moodColor = MoodColor(
             button = MoodSad35,
@@ -84,10 +87,10 @@ sealed class MoodUiModel(
 
     data object Stressed : MoodUiModel(
         title = "Stressed",
-        moodIcon = MoodIcon(
-            fillIcon = R.drawable.ic_stressed_mood,
-            strokeIcon = R.drawable.ic_stressed_stroke,
-            outlineIcon = R.drawable.ic_stressed_outline
+        moodIcons = MoodIcons(
+            fill = R.drawable.ic_stressed_mood,
+            stroke = R.drawable.ic_stressed_stroke,
+            outline = R.drawable.ic_stressed_outline
         ),
         moodColor = MoodColor(
             button = MoodStressed35,
@@ -98,8 +101,12 @@ sealed class MoodUiModel(
 
     data object Undefined: MoodUiModel(
         title = "",
-        moodIcon = MoodIcon(),
-        moodColor = MoodColor()
+        moodIcons = MoodIcons(),
+        moodColor = MoodColor(
+            button = MoodUndefined35,
+            track = MoodUndefined80,
+            background = MoodUndefined95
+        )
     )
 }
 
@@ -109,8 +116,8 @@ data class MoodColor(
     val background: Color = Color.Transparent
 )
 
-data class MoodIcon(
-    val fillIcon: Int = Constants.UNDEFINED_MOOD_ICON_RES,
-    val strokeIcon: Int = Constants.UNDEFINED_MOOD_ICON_RES,
-    val outlineIcon: Int = Constants.UNDEFINED_MOOD_ICON_RES
+data class MoodIcons(
+    val fill: Int = Constants.UNDEFINED_MOOD_ICON_RES,
+    val stroke: Int = Constants.UNDEFINED_MOOD_ICON_RES,
+    val outline: Int = Constants.UNDEFINED_MOOD_ICON_RES
 )

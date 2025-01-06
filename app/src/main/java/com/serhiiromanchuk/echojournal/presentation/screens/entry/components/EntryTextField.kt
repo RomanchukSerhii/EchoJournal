@@ -22,7 +22,7 @@ fun EntryTextField(
     leadingIcon: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     hintText: String = "",
-    textStyle: TextStyle = TextStyle.Default,
+    textStyle: TextStyle = MaterialTheme.typography.bodyMedium,
     iconSpacing: Dp = Dp.Unspecified
 ) {
     BasicTextField(

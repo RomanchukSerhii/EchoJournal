@@ -51,7 +51,7 @@ fun EntryBottomSheet(
 
     if (entrySheetState.isOpen) {
         ModalBottomSheet(
-            onDismissRequest = { onEvent(EntryUiEvent.BottomSheetToggled) },
+            onDismissRequest = { onEvent(EntryUiEvent.BottomSheetClosed) },
             sheetState = sheetState
         ) {
             Column(
@@ -74,9 +74,9 @@ fun EntryBottomSheet(
                     entrySheetState.moods.forEach { moodUiModel ->
                         MoodItem(
                             iconRes = if (entrySheetState.activeMood == moodUiModel) {
-                                moodUiModel.moodIcon.fillIcon
+                                moodUiModel.moodIcons.fill
                             } else {
-                                moodUiModel.moodIcon.outlineIcon
+                                moodUiModel.moodIcons.outline
                             },
                             title = moodUiModel.title,
                             onClick = {
@@ -89,7 +89,9 @@ fun EntryBottomSheet(
                 EntryBottomButtons(
                     primaryButtonText = stringResource(R.string.confirm),
                     onCancelClick = {},
-                    onConfirmClick = {},
+                    onConfirmClick = {
+                        onEvent(EntryUiEvent.SheetConfirmedClicked(entrySheetState.activeMood))
+                    },
                     primaryButtonEnabled = isPrimaryButtonEnabled,
                     primaryLeadingIcon = {
                         Icon(
