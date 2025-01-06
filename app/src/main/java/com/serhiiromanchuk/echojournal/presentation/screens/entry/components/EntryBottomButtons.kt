@@ -19,7 +19,8 @@ fun EntryBottomButtons(
     onCancelClick: () -> Unit,
     onConfirmClick: () -> Unit,
     modifier: Modifier = Modifier,
-    primaryButtonEnabled: Boolean = true
+    primaryButtonEnabled: Boolean = true,
+    primaryLeadingIcon: (@Composable () -> Unit)? = null
 ) {
     Row(
         modifier = modifier.height(IntrinsicSize.Max),
@@ -34,7 +35,8 @@ fun EntryBottomButtons(
             text = primaryButtonText,
             onClick = onConfirmClick,
             modifier = Modifier.weight(1f),
-            enabled = primaryButtonEnabled
+            enabled = primaryButtonEnabled,
+            leadingIcon = primaryLeadingIcon
         )
     }
 }

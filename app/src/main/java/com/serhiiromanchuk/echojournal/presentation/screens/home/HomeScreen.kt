@@ -62,7 +62,7 @@ fun HomeScreenRoot(
                 onEvent = viewModel::onEvent
             )
             RecordingBottomSheet(
-                bottomSheetState = uiState.bottomSheetState,
+                homeSheetState = uiState.homeSheetState,
                 onEvent = viewModel::onEvent
             )
         }

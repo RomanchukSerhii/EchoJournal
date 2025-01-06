@@ -100,7 +100,7 @@ class HomeViewModel @Inject constructor() : BaseHomeViewModel() {
 
     override fun onEvent(event: HomeUiEvent) {
         when (event) {
-            is HomeUiEvent.BottomSheetStateChanged -> updateState { it.copy(bottomSheetState = event.bottomSheetState) }
+            is HomeUiEvent.BottomSheetStateChanged -> updateState { it.copy(homeSheetState = event.homeSheetState) }
         }
     }
 }

@@ -20,4 +20,6 @@
     <string name="add_title">Add Title…</string>
     <string name="topic">Topic</string>
     <string name="add_description">Add Description</string>
+    <string name="how_are_you_doing">How are you doing?</string>
+    <string name="confirm">Confirm</string>
 </resources>

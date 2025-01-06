@@ -22,19 +22,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.serhiiromanchuk.echojournal.R
-import com.serhiiromanchuk.echojournal.domain.entity.MoodType
-import com.serhiiromanchuk.echojournal.presentation.core.utils.MoodProvider
+import com.serhiiromanchuk.echojournal.presentation.core.utils.MoodColor
 
 @Composable
 fun MoodPlayer(
-    moodType: MoodType,
+    moodColor: MoodColor,
     onPlayClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = CircleShape,
-        color = MoodProvider.getMoodColor(moodType).background
+        color = moodColor.background
     ) {
         Row(
             modifier = Modifier.padding(4.dp),
@@ -54,7 +53,7 @@ fun MoodPlayer(
                     imageVector = Icons.Default.PlayArrow,
                     contentDescription = stringResource(R.string.play_button),
                     modifier = Modifier.padding(4.dp),
-                    tint = MoodProvider.getMoodColor(moodType).button
+                    tint = moodColor.button
                 )
             }
 
@@ -62,7 +61,7 @@ fun MoodPlayer(
                 modifier = Modifier
                     .weight(1f)
                     .height(4.dp)
-                    .background(MoodProvider.getMoodColor(moodType).track, CircleShape)
+                    .background(moodColor.track, CircleShape)
             )
 
             Text(

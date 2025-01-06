@@ -30,28 +30,28 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.BottomSheetState
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.HomeSheetState
 import com.serhiiromanchuk.echojournal.R
 import com.serhiiromanchuk.echojournal.presentation.core.utils.GradientScheme
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent
 
 @Composable
 fun RecordingBottomSheet(
-    bottomSheetState: BottomSheetState,
+    homeSheetState: HomeSheetState,
     onEvent: (HomeUiEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val (recordingTime, isRecording) = when (bottomSheetState) {
-        BottomSheetState.Closed -> "" to false
-        is BottomSheetState.Pause -> bottomSheetState.recordingTime to false
-        is BottomSheetState.Recording -> bottomSheetState.recordingTime to true
+    val (recordingTime, isRecording) = when (homeSheetState) {
+        HomeSheetState.Closed -> "" to false
+        is HomeSheetState.Pause -> homeSheetState.recordingTime to false
+        is HomeSheetState.Recording -> homeSheetState.recordingTime to true
     }
 
     val sheetState = rememberModalBottomSheetState()
 
-    if (bottomSheetState != BottomSheetState.Closed) {
+    if (homeSheetState != HomeSheetState.Closed) {
         ModalBottomSheet(
-            onDismissRequest = { onEvent(HomeUiEvent.BottomSheetStateChanged(BottomSheetState.Closed)) },
+            onDismissRequest = { onEvent(HomeUiEvent.BottomSheetStateChanged(HomeSheetState.Closed)) },
             sheetState = sheetState
         ) {
             Column(

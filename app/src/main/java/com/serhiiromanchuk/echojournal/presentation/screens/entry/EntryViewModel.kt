@@ -1,9 +1,10 @@
 package com.serhiiromanchuk.echojournal.presentation.screens.entry
 
 import com.serhiiromanchuk.echojournal.presentation.core.base.BaseViewModel
+import com.serhiiromanchuk.echojournal.presentation.core.utils.MoodUiModel
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryActionEvent
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent
-import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiState
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.state.EntryUiState
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -21,8 +22,25 @@ class EntryViewModel @AssistedInject constructor(
 
     override fun onEvent(event: EntryUiEvent) {
         when(event) {
+            EntryUiEvent.BottomSheetToggled -> toggleBottomSheet()
+            is EntryUiEvent.MoodSelected -> updateActiveMood(event.mood)
+        }
+    }
 
-            else -> {}
+    private fun updateActiveMood(mood: MoodUiModel) {
+        updateState {
+            it.copy(
+                entrySheetState = currentState.entrySheetState.copy(activeMood = mood)
+            )
+        }
+    }
+
+    private fun toggleBottomSheet() {
+        updateState {
+            val currentSheetState = currentState.entrySheetState
+            it.copy(
+                entrySheetState = currentSheetState.copy(isOpen = !currentSheetState.isOpen)
+            )
         }
     }
 

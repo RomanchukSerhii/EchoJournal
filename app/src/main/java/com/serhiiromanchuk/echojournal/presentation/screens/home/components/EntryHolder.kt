@@ -50,7 +50,7 @@ import androidx.compose.ui.unit.dp
 import com.serhiiromanchuk.echojournal.domain.entity.Entry
 import com.serhiiromanchuk.echojournal.presentation.core.components.ExpandableText
 import com.serhiiromanchuk.echojournal.presentation.core.components.MoodPlayer
-import com.serhiiromanchuk.echojournal.presentation.core.utils.MoodProvider
+import com.serhiiromanchuk.echojournal.presentation.core.utils.toUiModel
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent
 import com.serhiiromanchuk.echojournal.presentation.theme.EchoUltraLightGray
 import com.serhiiromanchuk.echojournal.presentation.theme.NeutralVariant90
@@ -63,12 +63,13 @@ fun EntryHolder(
     onEvent: (HomeUiEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val moodUiModel = entry.moodType.toUiModel()
     Row(
         modifier = modifier.height(IntrinsicSize.Max)
     ) {
         // Mood icon
         MoodTimeline(
-            moodRes = MoodProvider.getMoodIcon(entry.moodType),
+            moodRes = moodUiModel.moodIcon.fillIcon,
             entryPosition = entryPosition,
             modifier = Modifier.fillMaxHeight()
         )
@@ -93,7 +94,7 @@ fun EntryHolder(
                 Spacer(modifier = Modifier.height(10.dp))
 
                 MoodPlayer(
-                    moodType = entry.moodType,
+                    moodColor = moodUiModel.moodColor,
                     onPlayClick = {}
                 )
 

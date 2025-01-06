@@ -26,15 +26,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.serhiiromanchuk.echojournal.R
-import com.serhiiromanchuk.echojournal.domain.entity.MoodType
 import com.serhiiromanchuk.echojournal.navigation.NavigationState
 import com.serhiiromanchuk.echojournal.presentation.core.base.BaseContentLayout
 import com.serhiiromanchuk.echojournal.presentation.core.components.AppTopBar
 import com.serhiiromanchuk.echojournal.presentation.core.components.MoodPlayer
+import com.serhiiromanchuk.echojournal.presentation.core.utils.MoodUiModel
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.EntryBottomButtons
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.EntryBottomSheet
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.EntryTextField
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent
-import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiState
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.state.EntryUiState
 import com.serhiiromanchuk.echojournal.presentation.theme.Inter
 import com.serhiiromanchuk.echojournal.presentation.theme.MoodUndefined95
 import com.serhiiromanchuk.echojournal.presentation.theme.PalettesSecondary70
@@ -82,6 +83,10 @@ fun EntryScreenRoot(
             uiState = uiState,
             onEvent = viewModel::onEvent
         )
+        EntryBottomSheet(
+            entrySheetState = uiState.entrySheetState,
+            onEvent = viewModel::onEvent
+        )
     }
 }
 
@@ -121,7 +126,7 @@ private fun EntryScreen(
         )
 
         MoodPlayer(
-            moodType = MoodType.Undefined,
+            moodColor = MoodUiModel.Undefined.moodColor,
             onPlayClick = {},
             modifier = Modifier.height(44.dp),
         )
