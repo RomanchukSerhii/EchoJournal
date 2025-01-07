@@ -1,5 +1,6 @@
 package com.serhiiromanchuk.echojournal.presentation.screens.entry.handling
 
+import com.serhiiromanchuk.echojournal.domain.entity.Topic
 import com.serhiiromanchuk.echojournal.presentation.core.base.common.UiEvent
 import com.serhiiromanchuk.echojournal.presentation.core.utils.MoodUiModel
 
@@ -8,7 +9,10 @@ sealed interface EntryUiEvent : UiEvent {
     data class BottomSheetOpened(val mood: MoodUiModel) : EntryUiEvent
     data class MoodSelected(val mood: MoodUiModel) : EntryUiEvent
     data class SheetConfirmedClicked(val mood: MoodUiModel) : EntryUiEvent
-    data class TitleChanged(val title: String) : EntryUiEvent
-    data class TopicChanged(val topic: String) : EntryUiEvent
-    data class DescriptionChanged(val description: String) : EntryUiEvent
+    data class TitleValueChanged(val value: String) : EntryUiEvent
+    data class TopicValueChanged(val value: String) : EntryUiEvent
+    data class DescriptionValueChanged(val value: String) : EntryUiEvent
+    data object CreateTopicClicked : EntryUiEvent
+    data class TopicClicked(val topic: Topic) : EntryUiEvent
+    data class TagClearClicked(val topic: Topic) : EntryUiEvent
 }

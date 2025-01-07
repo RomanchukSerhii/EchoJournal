@@ -10,6 +10,6 @@ data class Entry(
     val title: String = "",
     val description: String = "",
     val moodType: MoodType = MoodType.Neutral,
-    val topics: List<String> = listOf(),
+    val topics: List<Topic> = listOf(),
     val creationTimestamp: Instant = Instant.now()
 )

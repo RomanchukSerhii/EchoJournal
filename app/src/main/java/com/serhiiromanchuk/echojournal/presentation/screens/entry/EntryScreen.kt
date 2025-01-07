@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -11,36 +12,33 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.serhiiromanchuk.echojournal.R
 import com.serhiiromanchuk.echojournal.navigation.NavigationState
 import com.serhiiromanchuk.echojournal.presentation.core.base.BaseContentLayout
 import com.serhiiromanchuk.echojournal.presentation.core.components.AppTopBar
 import com.serhiiromanchuk.echojournal.presentation.core.components.MoodPlayer
+import com.serhiiromanchuk.echojournal.presentation.core.utils.toDp
+import com.serhiiromanchuk.echojournal.presentation.core.utils.toInt
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.EntryBottomButtons
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.EntryBottomSheet
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.EntryTextField
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.MoodChooseButton
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.TopicDropdown
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.TopicTextField
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.state.EntryUiState
-import com.serhiiromanchuk.echojournal.presentation.theme.Inter
 
 @Composable
 fun EntryScreenRoot(
@@ -101,18 +99,19 @@ private fun EntryScreen(
         var topicOffset by remember { mutableStateOf(IntOffset.Zero) }
 
         // Will be used to calculate the y-axis offset of the topicOffset
-        val verticalSpace = with(LocalDensity.current) { 16.dp.toPx() }
+        val verticalSpace = 16.dp.toInt()
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(verticalSpace.dp)
+            verticalArrangement = Arrangement.spacedBy(verticalSpace.toDp())
         ) {
             // AddTitle text field
             EntryTextField(
-                value = uiState.title,
-                onValueChange = { onEvent(EntryUiEvent.TitleChanged(it)) },
+                value = uiState.titleValue,
+                onValueChange = { onEvent(EntryUiEvent.TitleValueChanged(it)) },
+                modifier = Modifier.fillMaxWidth(),
                 hintText = stringResource(R.string.add_title),
                 leadingIcon = {
                     MoodChooseButton(
@@ -130,37 +129,24 @@ private fun EntryScreen(
                 modifier = Modifier.height(44.dp),
             )
 
-            // Topic text field
-            EntryTextField(
-                value = uiState.topic,
-                onValueChange = { onEvent(EntryUiEvent.TopicChanged(it)) },
-                leadingIcon = {
-                    Box(
-                        modifier = Modifier.size(16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "#",
-                            fontFamily = Inter,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.outlineVariant
-                        )
-                    }
-                },
+            TopicTextField(
+                value = uiState.topicValue,
+                onValueChange = { onEvent(EntryUiEvent.TopicValueChanged(it)) },
+                topics = uiState.currentTopics,
+                onTagClearClick = { onEvent(EntryUiEvent.TagClearClicked(it)) },
                 modifier = Modifier.onGloballyPositioned { coordinates ->
                     topicOffset = IntOffset(
                         coordinates.positionInParent().x.toInt(),
-                        coordinates.positionInParent().y.toInt() + coordinates.size.height + verticalSpace.toInt()
+                        coordinates.positionInParent().y.toInt() + coordinates.size.height + verticalSpace
                     )
-                },
-                hintText = stringResource(R.string.topic)
+                }
             )
 
             // AddDescription field
             EntryTextField(
-                value = uiState.description,
-                onValueChange = { onEvent(EntryUiEvent.DescriptionChanged(it)) },
+                value = uiState.descriptionValue,
+                onValueChange = { onEvent(EntryUiEvent.DescriptionValueChanged(it)) },
+                modifier = Modifier.fillMaxWidth(),
                 hintText = stringResource(R.string.add_description),
                 leadingIcon = {
                     Icon(
@@ -174,10 +160,10 @@ private fun EntryScreen(
         }
 
         TopicDropdown(
-            searchQuery = uiState.topic,
-            topics = listOf("Jack", "Jared", "Jasper"),
-            onTopicClick = {},
-            onCreateClick = {},
+            searchQuery = uiState.topicValue,
+            topics = uiState.foundTopics,
+            onTopicClick = { onEvent(EntryUiEvent.TopicClicked(it)) },
+            onCreateClick = { onEvent(EntryUiEvent.CreateTopicClicked) },
             startOffset = topicOffset
         )
     }

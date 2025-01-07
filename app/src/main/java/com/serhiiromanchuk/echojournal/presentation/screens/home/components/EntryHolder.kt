@@ -120,7 +120,7 @@ fun EntryHolder(
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         entry.topics.forEach { topic ->
-                            TopicChip(title = topic)
+                            TopicChip(title = topic.name)
                         }
                     }
                 }

@@ -23,4 +23,5 @@
     <string name="how_are_you_doing">How are you doing?</string>
     <string name="confirm">Confirm</string>
     <string name="create_topic">Create topic %1$s</string>
+    <string name="delete_topic">Delete topic</string>
 </resources>

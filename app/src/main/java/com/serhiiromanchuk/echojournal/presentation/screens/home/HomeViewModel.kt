@@ -2,6 +2,7 @@ package com.serhiiromanchuk.echojournal.presentation.screens.home
 
 import com.serhiiromanchuk.echojournal.domain.entity.Entry
 import com.serhiiromanchuk.echojournal.domain.entity.MoodType
+import com.serhiiromanchuk.echojournal.domain.entity.Topic
 import com.serhiiromanchuk.echojournal.presentation.core.base.BaseViewModel
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeActionEvent
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent
@@ -24,6 +25,17 @@ class HomeViewModel @Inject constructor() : BaseHomeViewModel() {
         val yesterday = today.minusSeconds(86400) // Мінус 1 день
         val dayBeforeYesterday = yesterday.minusSeconds(86400) // Мінус ще 1 день
 
+        val topics = listOf(
+            Topic(
+                id = 0,
+                name = "Work"
+            ),
+            Topic(
+                id = 0,
+                name = "Conundrums"
+            ),
+        )
+
         val entries = mapOf(
             Pair(
                 today, listOf(
@@ -31,21 +43,21 @@ class HomeViewModel @Inject constructor() : BaseHomeViewModel() {
                         id = 7L,
                         title = "MyEntry",
                         moodType = MoodType.Peaceful,
-                        topics = listOf("Work", "Conundrums"),
+                        topics = topics,
                         creationTimestamp = today
                     ),
                     Entry(
                         id = 6L,
                         title = "MyEntry",
                         moodType = MoodType.Peaceful,
-                        topics = listOf("Work", "Conundrums"),
+                        topics = topics,
                         creationTimestamp = today
                     ),
                     Entry(
                         id = 5L,
                         title = "MyEntry",
                         moodType = MoodType.Peaceful,
-                        topics = listOf("Work", "Conundrums"),
+                        topics = topics,
                         creationTimestamp = today
                     ),
                     Entry(
@@ -58,7 +70,7 @@ class HomeViewModel @Inject constructor() : BaseHomeViewModel() {
                         id = 3L,
                         title = "MyEntry",
                         moodType = MoodType.Peaceful,
-                        topics = listOf("Work", "Conundrums"),
+                        topics = topics,
                         creationTimestamp = today
                     )
                 )

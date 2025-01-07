@@ -1,10 +1,13 @@
+@file:OptIn(ExperimentalLayoutApi::class)
+
 package com.serhiiromanchuk.echojournal.presentation.screens.entry.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
@@ -26,8 +29,8 @@ import androidx.compose.ui.unit.dp
 fun EntryTextField(
     value: String,
     onValueChange: (String) -> Unit,
-    leadingIcon: @Composable () -> Unit,
     modifier: Modifier = Modifier,
+    leadingIcon: (@Composable () -> Unit)? = null,
     hintText: String = "",
     textStyle: TextStyle = MaterialTheme.typography.bodyMedium.copy(
         color = MaterialTheme.colorScheme.onSurface
@@ -46,31 +49,36 @@ fun EntryTextField(
             capitalization = KeyboardCapitalization.Sentences
         ),
         decorationBox = { innerTextField ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
+            Row (
+                modifier = Modifier,
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 // Leading icon
+                leadingIcon?.let {
+                    Box(
+                        modifier = Modifier
+                            .padding(end = iconSpacing)
+                    ) {
+                        leadingIcon()
+                    }
+                }
+
                 Box(
-                    modifier = Modifier
-                        .padding(end = iconSpacing)
+                    modifier = Modifier.widthIn(min = 62.dp).align(Alignment.CenterVertically)
                 ) {
-                    leadingIcon()
-                }
-
-                // Hint text
-                if (value.isEmpty() && !isFocused) {
-                    Text(
-                        text = hintText,
-                        style = textStyle.copy(
-                            color = MaterialTheme.colorScheme.outlineVariant
+                    if (value.isEmpty() && !isFocused) {
+                        // Hint text
+                        Text(
+                            text = hintText,
+                            style = textStyle.copy(
+                                color = MaterialTheme.colorScheme.outlineVariant
+                            )
                         )
-                    )
+                    } else {
+                        innerTextField()
+                    }
                 }
-
-                innerTextField()
             }
         }
     )

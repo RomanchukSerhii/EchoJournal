@@ -1,8 +1,11 @@
 package com.serhiiromanchuk.echojournal.presentation.screens.entry.components
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -17,42 +20,75 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.serhiiromanchuk.echojournal.R
+import com.serhiiromanchuk.echojournal.domain.entity.Topic
 
 @Composable
 fun TopicDropdown(
     searchQuery: String,
-    topics: List<String>,
-    onTopicClick: (String) -> Unit,
+    topics: List<Topic>,
+    onTopicClick: (Topic) -> Unit,
     onCreateClick: () -> Unit,
     modifier: Modifier = Modifier,
     startOffset: IntOffset = IntOffset.Zero
 ) {
-    Surface(
-        modifier = modifier.offset { startOffset },
-        shape = RoundedCornerShape(10.dp),
-        shadowElevation = 8.dp
-    ) {
-        LazyColumn (
-            modifier = Modifier.padding(4.dp)
-        ) { 
-            items(items = topics) { topic ->
-                TopicItem(
-                    topic = topic,
-                    onClick = { onTopicClick(topic) }
-                )
-            }
-            item {
-                CreateButton(
-                    searchQuery = searchQuery,
-                    onClick = { onCreateClick() }
-                )
+    var isVisible by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
+
+    LaunchedEffect(searchQuery) {
+        isVisible = searchQuery.isNotEmpty()
+    }
+
+    if (isVisible) {
+        Box(
+            modifier = modifier
+                .offset { startOffset }
+                .fillMaxSize()
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) { isVisible = false }
+        ) {
+            Surface(
+                shape = RoundedCornerShape(10.dp),
+                shadowElevation = 8.dp
+            ) {
+                LazyColumn (
+                    modifier = Modifier.padding(4.dp)
+                ) {
+                    items(items = topics) { topic ->
+                        TopicItem(
+                            topic = topic.name,
+                            onClick = {
+                                onTopicClick(topic)
+                                focusManager.clearFocus()
+                            }
+                        )
+                    }
+                    item {
+                        CreateButton(
+                            searchQuery = searchQuery,
+                            onClick = {
+                                onCreateClick()
+                                isVisible = false
+                                focusManager.clearFocus()
+                            }
+                        )
+                    }
+                }
             }
         }
     }
@@ -67,6 +103,7 @@ private fun TopicItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(6.dp))
             .clickable { onClick() }
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -100,6 +137,7 @@ private fun CreateButton(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(6.dp))
             .clickable { onClick() }
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
