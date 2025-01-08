@@ -5,6 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.EntryScreenRoot
 import com.serhiiromanchuk.echojournal.presentation.screens.home.HomeScreenRoot
+import com.serhiiromanchuk.echojournal.presentation.screens.settings.SettingsScreenRoot
 import com.serhiiromanchuk.echojournal.utils.Constants
 
 fun NavGraphBuilder.homeRoute(
@@ -34,6 +35,18 @@ fun NavGraphBuilder.entryRoute(
             navigationState = navigationState,
             entryFilePath = entryFilePath,
             entryId = entryId
+        )
+    }
+}
+
+fun NavGraphBuilder.settingsRoute(
+    modifier: Modifier = Modifier,
+    navigationState: NavigationState
+) {
+    composable(route = Screen.Settings.route) {
+        SettingsScreenRoot(
+            modifier = modifier,
+            navigationState = navigationState
         )
     }
 }

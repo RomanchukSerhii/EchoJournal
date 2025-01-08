@@ -29,7 +29,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 
-typealias BaseEntryViewModel = BaseViewModel<EntryUiState, EntryUiEvent, EntryActionEvent>
+typealias EntryBaseViewModel = BaseViewModel<EntryUiState, EntryUiEvent, EntryActionEvent>
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel(assistedFactory = EntryViewModel.EntryViewModelFactory::class)
@@ -37,7 +37,7 @@ class EntryViewModel @AssistedInject constructor(
     @Assisted val entryFilePath: String,
     @Assisted val entryId: Long,
     private val topicDbRepository: TopicDbRepository,
-) : BaseEntryViewModel() {
+) : EntryBaseViewModel() {
     override val initialState: EntryUiState
         get() = EntryUiState()
 

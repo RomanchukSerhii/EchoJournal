@@ -24,4 +24,9 @@
     <string name="confirm">Confirm</string>
     <string name="create_topic">Create topic %1$s</string>
     <string name="delete_topic">Delete topic</string>
+    <string name="my_mood">My Mood</string>
+    <string name="mood_header_description">Select default mood to apply to all new entries</string>
+    <string name="settings">Settings</string>
+    <string name="my_topics">My Topics</string>
+    <string name="topic_header_description">Select default topics to apply to all new entries</string>
 </resources>

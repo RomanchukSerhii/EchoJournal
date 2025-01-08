@@ -21,5 +21,9 @@ fun RootAppNavigation(
             modifier = modifier,
             navigationState = navigationState
         )
+        settingsRoute(
+            modifier = modifier,
+            navigationState = navigationState
+        )
     }
 }

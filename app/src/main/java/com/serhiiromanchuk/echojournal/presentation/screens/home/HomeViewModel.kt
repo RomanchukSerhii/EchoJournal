@@ -12,10 +12,10 @@ import java.time.LocalDate
 import java.time.ZoneId
 import javax.inject.Inject
 
-private typealias BaseHomeViewModel = BaseViewModel<HomeUiState, HomeUiEvent, HomeActionEvent>
+private typealias HomeBaseViewModel = BaseViewModel<HomeUiState, HomeUiEvent, HomeActionEvent>
 
 @HiltViewModel
-class HomeViewModel @Inject constructor() : BaseHomeViewModel() {
+class HomeViewModel @Inject constructor() : HomeBaseViewModel() {
     override val initialState: HomeUiState
         get() = HomeUiState()
 
@@ -39,27 +39,6 @@ class HomeViewModel @Inject constructor() : BaseHomeViewModel() {
         val entries = mapOf(
             Pair(
                 today, listOf(
-                    Entry(
-                        id = 7L,
-                        title = "MyEntry",
-                        moodType = MoodType.Peaceful,
-                        topics = topics,
-                        creationTimestamp = today
-                    ),
-                    Entry(
-                        id = 6L,
-                        title = "MyEntry",
-                        moodType = MoodType.Peaceful,
-                        topics = topics,
-                        creationTimestamp = today
-                    ),
-                    Entry(
-                        id = 5L,
-                        title = "MyEntry",
-                        moodType = MoodType.Peaceful,
-                        topics = topics,
-                        creationTimestamp = today
-                    ),
                     Entry(
                         id = 4L,
                         title = "MyEntry",

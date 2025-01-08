@@ -29,6 +29,7 @@ sealed class MoodUiModel(
     val moodIcons: MoodIcons,
     val moodColor: MoodColor,
 ) {
+
     data object Excited : MoodUiModel(
         title = "Excited",
         moodIcons = MoodIcons(
@@ -108,6 +109,16 @@ sealed class MoodUiModel(
             background = MoodUndefined95
         )
     )
+
+    fun getAllMoods(): List<MoodUiModel> {
+        return listOf(
+            Stressed,
+            Sad,
+            Neutral,
+            Peaceful,
+            Excited
+        )
+    }
 }
 
 data class MoodColor(

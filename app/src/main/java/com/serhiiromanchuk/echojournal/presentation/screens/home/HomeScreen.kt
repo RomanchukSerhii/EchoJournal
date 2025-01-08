@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.serhiiromanchuk.echojournal.R
 import com.serhiiromanchuk.echojournal.navigation.NavigationState
+import com.serhiiromanchuk.echojournal.navigation.Screen
 import com.serhiiromanchuk.echojournal.presentation.core.base.BaseContentLayout
 import com.serhiiromanchuk.echojournal.presentation.core.components.EchoFAB
 import com.serhiiromanchuk.echojournal.presentation.screens.home.components.EchoFilter
@@ -36,7 +37,9 @@ fun HomeScreenRoot(
         topBar = {
             HomeTopBar(
                 title = stringResource(R.string.your_echojournal),
-                onSettingsClick = {}
+                onSettingsClick = {
+                    navigationState.navigateTo(Screen.Settings.route)
+                }
             )
         },
         floatingActionButton = {
