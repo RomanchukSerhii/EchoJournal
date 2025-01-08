@@ -53,7 +53,6 @@ import com.serhiiromanchuk.echojournal.presentation.core.components.MoodPlayer
 import com.serhiiromanchuk.echojournal.presentation.core.utils.toUiModel
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent
 import com.serhiiromanchuk.echojournal.presentation.theme.EchoUltraLightGray
-import com.serhiiromanchuk.echojournal.presentation.theme.NeutralVariant90
 import com.serhiiromanchuk.echojournal.utils.InstantFormatter
 
 @Composable
@@ -242,7 +241,7 @@ private fun MoodTimeline(
                     IntOffset(dividerOffsetX, dividerOffsetY)
                 }
                 .height(dividerHeight.toDp()),
-            color = NeutralVariant90
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.7f)
         )
 
         Image(

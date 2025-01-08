@@ -74,7 +74,7 @@ fun EntryScreenRoot(
                 onCancelClick = {},
                 onConfirmClick = {},
                 modifier = Modifier.padding(16.dp),
-                primaryButtonEnabled = false
+                primaryButtonEnabled = uiState.isSaveButtonEnabled
             )
         },
         containerColor = MaterialTheme.colorScheme.surface

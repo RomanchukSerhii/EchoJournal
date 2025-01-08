@@ -1,6 +1,7 @@
 package com.serhiiromanchuk.echojournal.presentation.screens.home.components
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -22,22 +23,22 @@ fun HomeTopBar(
     onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(
+    Row (
         modifier = modifier
             .fillMaxWidth()
             .height(48.dp)
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         // Title
         Text(
-            modifier = Modifier.align(Alignment.CenterStart),
             text = title,
             style = MaterialTheme.typography.titleMedium
         )
 
         // Settings icon
         IconButton(
-            modifier = Modifier.align(Alignment.CenterEnd),
             onClick = { onSettingsClick() }
         ) {
             Icon(

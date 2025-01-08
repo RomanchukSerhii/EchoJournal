@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,22 +33,9 @@ fun TopicTextField(
     FlowRow(
         modifier = modifier
             .fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(6.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        Box(
-            modifier = Modifier.size(16.dp).align(Alignment.CenterVertically),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "#",
-                fontFamily = Inter,
-                fontWeight = FontWeight.Medium,
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.outlineVariant
-            )
-        }
-
         topics.forEach { topic ->
             TopicTag(
                 topic = topic,
@@ -60,7 +47,21 @@ fun TopicTextField(
             value = value,
             onValueChange = onValueChange,
             modifier = Modifier.weight(1f).align(Alignment.CenterVertically),
-            hintText = stringResource(R.string.topic)
+            hintText = stringResource(R.string.topic),
+            leadingIcon = {
+                Box(
+                    modifier = Modifier.width(18.dp).align(Alignment.CenterVertically),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "#",
+                        fontFamily = Inter,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.outlineVariant
+                    )
+                }
+            }
         )
     }
 }

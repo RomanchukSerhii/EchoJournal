@@ -21,7 +21,6 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -32,12 +31,12 @@ import kotlinx.coroutines.flow.stateIn
 
 typealias BaseEntryViewModel = BaseViewModel<EntryUiState, EntryUiEvent, EntryActionEvent>
 
-@OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel(assistedFactory = EntryViewModel.EntryViewModelFactory::class)
 class EntryViewModel @AssistedInject constructor(
     @Assisted val entryFilePath: String,
     @Assisted val entryId: Long,
-    private val topicDbRepository: TopicDbRepository
+    private val topicDbRepository: TopicDbRepository,
 ) : BaseEntryViewModel() {
     override val initialState: EntryUiState
         get() = EntryUiState()
@@ -62,7 +61,7 @@ class EntryViewModel @AssistedInject constructor(
 
     init {
         launch {
-            searchResults.collect{
+            searchResults.collect {
                 updateState { it.copy(foundTopics = searchResults.value) }
             }
         }
@@ -73,9 +72,16 @@ class EntryViewModel @AssistedInject constructor(
             BottomSheetClosed -> updateState {
                 it.copy(entrySheetState = toggleSheetState(currentState.entrySheetState))
             }
+
             is BottomSheetOpened -> updateState {
-                it.copy(entrySheetState = toggleSheetState(currentState.entrySheetState, event.mood))
+                it.copy(
+                    entrySheetState = toggleSheetState(
+                        currentState.entrySheetState,
+                        event.mood
+                    )
+                )
             }
+
             is MoodSelected -> updateActiveMood(event.mood)
             is SheetConfirmedClicked -> setCurrentMood(event.mood)
             is TitleValueChanged -> updateState { it.copy(titleValue = event.value) }

@@ -12,4 +12,7 @@ data class EntryUiState(
     val currentTopics: List<Topic> = listOf(),
     val foundTopics: List<Topic> = listOf(),
     val entrySheetState: EntrySheetState = EntrySheetState()
-) : UiState
+) : UiState {
+    val isSaveButtonEnabled: Boolean
+        get() = titleValue.isNotBlank() && currentMood != MoodUiModel.Undefined
+}
