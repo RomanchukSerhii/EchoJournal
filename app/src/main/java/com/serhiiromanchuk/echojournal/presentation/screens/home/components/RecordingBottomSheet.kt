@@ -30,10 +30,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.HomeSheetState
 import com.serhiiromanchuk.echojournal.R
 import com.serhiiromanchuk.echojournal.presentation.core.utils.GradientScheme
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.HomeSheetState
 
 @Composable
 fun RecordingBottomSheet(
@@ -41,17 +41,12 @@ fun RecordingBottomSheet(
     onEvent: (HomeUiEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val (recordingTime, isRecording) = when (homeSheetState) {
-        HomeSheetState.Closed -> "" to false
-        is HomeSheetState.Pause -> homeSheetState.recordingTime to false
-        is HomeSheetState.Recording -> homeSheetState.recordingTime to true
-    }
 
     val sheetState = rememberModalBottomSheetState()
 
-    if (homeSheetState != HomeSheetState.Closed) {
+    if (homeSheetState.isVisible) {
         ModalBottomSheet(
-            onDismissRequest = { onEvent(HomeUiEvent.BottomSheetStateChanged(HomeSheetState.Closed)) },
+            onDismissRequest = { onEvent(HomeUiEvent.BottomSheetToggled) },
             sheetState = sheetState
         ) {
             Column(
@@ -60,15 +55,27 @@ fun RecordingBottomSheet(
             ) {
                 BottomSheetHeader(
                     modifier = Modifier.padding(vertical = 8.dp),
-                    isRecording = isRecording,
-                    recordingTime = recordingTime
+                    isRecording = homeSheetState.isRecording,
+                    recordingTime = homeSheetState.recordingTime
                 )
                 RecordButtons(
                     modifier = Modifier.padding(vertical = 42.dp, horizontal = 16.dp),
-                    isRecording = isRecording,
-                    onCancelClick = {},
-                    onRecordClick = {},
-                    onPauseClick = {}
+                    isRecording = homeSheetState.isRecording,
+                    onCancelClick = { onEvent(HomeUiEvent.CancelRecording) },
+                    onRecordClick = {
+                        if (homeSheetState.isRecording) {
+                            onEvent(HomeUiEvent.StopRecording)
+                        } else {
+                            onEvent(HomeUiEvent.ResumeRecording)
+                        }
+                    },
+                    onPauseClick = {
+                        if (homeSheetState.isRecording) {
+                            onEvent(HomeUiEvent.PauseRecording)
+                        } else {
+                            onEvent(HomeUiEvent.StopRecording)
+                        }
+                    }
                 )
             }
         }
@@ -144,9 +151,9 @@ private fun RecordButtons(
         ) {
             Image(
                 painter = if (isRecording) {
-                    painterResource(R.drawable.ic_recording)
-                } else {
                     painterResource(R.drawable.ic_checkmark)
+                } else {
+                    painterResource(R.drawable.ic_recording)
                 },
                 contentDescription = stringResource(R.string.recording_button)
             )

@@ -29,4 +29,9 @@
     <string name="settings">Settings</string>
     <string name="my_topics">My Topics</string>
     <string name="topic_header_description">Select default topics to apply to all new entries</string>
+    <string name="grant_permission">Grant permission</string>
+    <string name="ok">OK</string>
+    <string name="permission_required">Permission required</string>
+    <string name="permission_dialog_declined_text">It seems you permanently declined microphone permission. You can go to the app settings to grant it.</string>
+    <string name="permission_dialog_text">This app needs access to your microphone so you can capture your thoughts and mood with voice memos.</string>
 </resources>

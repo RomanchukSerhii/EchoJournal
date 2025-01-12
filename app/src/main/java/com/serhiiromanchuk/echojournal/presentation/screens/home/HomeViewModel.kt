@@ -1,11 +1,19 @@
 package com.serhiiromanchuk.echojournal.presentation.screens.home
 
+import com.serhiiromanchuk.echojournal.domain.audio.AudioRecorder
 import com.serhiiromanchuk.echojournal.domain.entity.Entry
 import com.serhiiromanchuk.echojournal.domain.entity.MoodType
 import com.serhiiromanchuk.echojournal.domain.entity.Topic
 import com.serhiiromanchuk.echojournal.presentation.core.base.BaseViewModel
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeActionEvent
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.BottomSheetToggled
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.CancelRecording
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.PauseRecording
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.PermissionDialogOpened
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.ResumeRecording
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.StartRecording
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.StopRecording
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDate
@@ -15,7 +23,9 @@ import javax.inject.Inject
 private typealias HomeBaseViewModel = BaseViewModel<HomeUiState, HomeUiEvent, HomeActionEvent>
 
 @HiltViewModel
-class HomeViewModel @Inject constructor() : HomeBaseViewModel() {
+class HomeViewModel @Inject constructor(
+    private val audioRecorder: AudioRecorder
+) : HomeBaseViewModel() {
     override val initialState: HomeUiState
         get() = HomeUiState()
 
@@ -91,7 +101,42 @@ class HomeViewModel @Inject constructor() : HomeBaseViewModel() {
 
     override fun onEvent(event: HomeUiEvent) {
         when (event) {
-            is HomeUiEvent.BottomSheetStateChanged -> updateState { it.copy(homeSheetState = event.homeSheetState) }
+            BottomSheetToggled -> toggleSheetState()
+            StartRecording -> TODO()
+            PauseRecording -> {
+                audioRecorder.pause()
+                toggleRecordingState()
+            }
+            ResumeRecording -> {
+                audioRecorder.resume()
+                toggleRecordingState()
+            }
+            StopRecording -> toggleSheetState()
+            CancelRecording -> TODO()
+            is PermissionDialogOpened -> updateState { it.copy(isPermissionDialogOpen = event.isOpen) }
         }
+    }
+
+    private fun pauseRecording() {
+        audioRecorder.pause()
+        toggleRecordingState()
+    }
+
+    private fun toggleSheetState() {
+        val updateSheetState = currentState.homeSheetState.copy(isVisible = !currentState.homeSheetState.isVisible)
+
+        if (updateSheetState.isVisible) {
+            val outputFile = audioRecorder.createAudioFile()
+            audioRecorder.start(outputFile)
+        } else {
+            audioRecorder.stop()
+        }
+
+        updateState { it.copy(homeSheetState = updateSheetState) }
+    }
+
+    private fun toggleRecordingState() {
+        val updateSheetState = currentState.homeSheetState.copy(isRecording = !currentState.homeSheetState.isRecording)
+        updateState { it.copy(homeSheetState = updateSheetState) }
     }
 }

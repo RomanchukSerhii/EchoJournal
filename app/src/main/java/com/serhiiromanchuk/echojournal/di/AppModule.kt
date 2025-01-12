@@ -2,9 +2,13 @@ package com.serhiiromanchuk.echojournal.di
 
 import android.content.Context
 import androidx.room.Room
+import com.serhiiromanchuk.echojournal.data.AndroidAudioRecorder
 import com.serhiiromanchuk.echojournal.data.database.TopicDao
 import com.serhiiromanchuk.echojournal.data.database.TopicDatabase
+import com.serhiiromanchuk.echojournal.data.repository.AndroidAudioPlayer
 import com.serhiiromanchuk.echojournal.data.repository.TopicDbRepositoryImpl
+import com.serhiiromanchuk.echojournal.domain.audio.AudioPlayer
+import com.serhiiromanchuk.echojournal.domain.audio.AudioRecorder
 import com.serhiiromanchuk.echojournal.domain.repository.TopicDbRepository
 import com.serhiiromanchuk.echojournal.utils.Constants
 import dagger.Module
@@ -38,4 +42,20 @@ object AppProvidesModule {
     fun provideTopicDbRepository(
         topicDao: TopicDao
     ): TopicDbRepository = TopicDbRepositoryImpl(topicDao)
+
+    @Provides
+    @Singleton
+    fun provideAudioRecorder(
+        @ApplicationContext context: Context
+    ): AudioRecorder {
+        return AndroidAudioRecorder(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAudioPlayer(
+        @ApplicationContext context: Context
+    ): AudioPlayer {
+        return AndroidAudioPlayer(context)
+    }
 }

@@ -7,5 +7,6 @@ import java.time.Instant
 data class HomeUiState(
     val entries: Map<Instant, List<Entry>> = mapOf(),
     val filterState: FilterState = FilterState(),
-    val homeSheetState: HomeSheetState = HomeSheetState.Closed
+    val homeSheetState: HomeSheetState = HomeSheetState(),
+    val isPermissionDialogOpen: Boolean = false
 ) : UiState
