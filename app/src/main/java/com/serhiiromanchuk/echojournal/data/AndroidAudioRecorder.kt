@@ -3,6 +3,7 @@ package com.serhiiromanchuk.echojournal.data
 import android.content.Context
 import android.media.MediaRecorder
 import android.os.Build
+import android.os.Environment
 import android.util.Log
 import com.serhiiromanchuk.echojournal.domain.audio.AudioRecorder
 import java.io.File
@@ -21,18 +22,18 @@ class AndroidAudioRecorder @Inject constructor(
         } else MediaRecorder()
     }
 
-    override fun createAudioFile(): File {
+    override fun createAudioFile(): String {
         val fileName = "audio_${System.currentTimeMillis()}.mp3"
-        val outputDir = context.filesDir
-        return File(outputDir, fileName)
+        val outputDir = context.getExternalFilesDir(Environment.DIRECTORY_MUSIC)
+        return File(outputDir, fileName).absolutePath
     }
 
-    override fun start(outputFile: File) {
+    override fun start(outputFilePath: String) {
         createRecorder().apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)
             setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
             setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-            setOutputFile(outputFile.absoluteFile)
+            setOutputFile(outputFilePath)
 
             try {
                 prepare()

@@ -8,5 +8,6 @@ data class HomeUiState(
     val entries: Map<Instant, List<Entry>> = mapOf(),
     val filterState: FilterState = FilterState(),
     val homeSheetState: HomeSheetState = HomeSheetState(),
-    val isPermissionDialogOpen: Boolean = false
+    val isPermissionDialogOpen: Boolean = false,
+    val uriFilePath: String = ""
 ) : UiState

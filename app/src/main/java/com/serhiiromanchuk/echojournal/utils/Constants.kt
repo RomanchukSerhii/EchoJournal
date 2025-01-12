@@ -7,4 +7,5 @@ object Constants {
     const val UNDEFINED_MOOD_ICON_RES = 0
     const val DEFAULT_MINIMUM_TEXT_LINE = 3
     const val TOPIC_DB = "topic_db"
+    const val DEFAULT_FORMATTED_TIME = "00:00:00"
 }

@@ -1,5 +1,6 @@
 package com.serhiiromanchuk.echojournal.presentation.screens.home
 
+import android.net.Uri
 import com.serhiiromanchuk.echojournal.domain.audio.AudioRecorder
 import com.serhiiromanchuk.echojournal.domain.entity.Entry
 import com.serhiiromanchuk.echojournal.domain.entity.MoodType
@@ -14,7 +15,9 @@ import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUi
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.ResumeRecording
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.StartRecording
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.StopRecording
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.HomeSheetState
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.HomeUiState
+import com.serhiiromanchuk.echojournal.utils.StopWatch
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDate
 import java.time.ZoneId
@@ -29,7 +32,17 @@ class HomeViewModel @Inject constructor(
     override val initialState: HomeUiState
         get() = HomeUiState()
 
+    private val stopWatch = StopWatch()
+
     init {
+
+        launch {
+            stopWatch.formattedTime.collect {
+                val updatedSheetState = currentState.homeSheetState.copy(recordingTime = it)
+                updateHomeSheetState(updatedSheetState)
+            }
+        }
+
         val zoneId = ZoneId.systemDefault()
         val today = LocalDate.now(zoneId).atStartOfDay(zoneId).toInstant()
         val yesterday = today.minusSeconds(86400) // Мінус 1 день
@@ -103,40 +116,58 @@ class HomeViewModel @Inject constructor(
         when (event) {
             BottomSheetToggled -> toggleSheetState()
             StartRecording -> TODO()
-            PauseRecording -> {
-                audioRecorder.pause()
-                toggleRecordingState()
-            }
-            ResumeRecording -> {
-                audioRecorder.resume()
-                toggleRecordingState()
-            }
-            StopRecording -> toggleSheetState()
+            PauseRecording -> pauseRecording()
+            ResumeRecording -> resumeRecording()
+            StopRecording -> stopRecording()
             CancelRecording -> TODO()
             is PermissionDialogOpened -> updateState { it.copy(isPermissionDialogOpen = event.isOpen) }
         }
     }
 
+//    private fun startRecording() {
+//        toggleRecordingState()
+//        stopWatch.start()
+//    }
+
     private fun pauseRecording() {
         audioRecorder.pause()
+        stopWatch.pause()
         toggleRecordingState()
     }
 
-    private fun toggleSheetState() {
-        val updateSheetState = currentState.homeSheetState.copy(isVisible = !currentState.homeSheetState.isVisible)
+    private fun resumeRecording() {
+        audioRecorder.resume()
+        stopWatch.start()
+        toggleRecordingState()
+    }
 
-        if (updateSheetState.isVisible) {
-            val outputFile = audioRecorder.createAudioFile()
-            audioRecorder.start(outputFile)
+    private fun stopRecording() {
+        toggleSheetState()
+        sendActionEvent(HomeActionEvent.NavigateToEntryScreen(currentState.uriFilePath))
+    }
+
+    private fun toggleSheetState() {
+        val updatedSheetState = currentState.homeSheetState.copy(isVisible = !currentState.homeSheetState.isVisible)
+
+        if (updatedSheetState.isVisible) {
+            val outputFilePath = audioRecorder.createAudioFile()
+            updateState { it.copy(uriFilePath = Uri.encode(outputFilePath)) }
+            audioRecorder.start(outputFilePath)
+            stopWatch.start()
         } else {
             audioRecorder.stop()
+            stopWatch.reset()
         }
 
-        updateState { it.copy(homeSheetState = updateSheetState) }
+        updateHomeSheetState(updatedSheetState)
     }
 
     private fun toggleRecordingState() {
-        val updateSheetState = currentState.homeSheetState.copy(isRecording = !currentState.homeSheetState.isRecording)
-        updateState { it.copy(homeSheetState = updateSheetState) }
+        val updatedSheetState = currentState.homeSheetState.copy(isRecording = !currentState.homeSheetState.isRecording)
+        updateHomeSheetState(updatedSheetState)
+    }
+
+    private fun updateHomeSheetState(updatedSheetState: HomeSheetState) {
+        updateState { it.copy(homeSheetState = updatedSheetState) }
     }
 }

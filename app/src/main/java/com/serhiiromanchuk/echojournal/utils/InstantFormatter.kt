@@ -3,6 +3,7 @@ package com.serhiiromanchuk.echojournal.utils
 import java.time.Instant
 import java.time.ZoneId
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -25,5 +26,17 @@ object InstantFormatter {
     fun formatHoursAndMinutes(instant: Instant): String {
         val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
         return instant.atZone(zoneId).toLocalDateTime().format(timeFormatter)
+    }
+
+    fun formatMillisToTime(timeMillis: Long): String {
+        val localDateTime = LocalDateTime.ofInstant(
+            Instant.ofEpochMilli(timeMillis),
+            zoneId
+        )
+        val formatter = DateTimeFormatter.ofPattern(
+            "mm:ss:SS",
+            Locale.getDefault()
+        )
+        return localDateTime.format(formatter)
     }
 }
