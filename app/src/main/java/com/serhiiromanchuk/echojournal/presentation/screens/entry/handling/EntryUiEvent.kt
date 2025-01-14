@@ -15,4 +15,8 @@ sealed interface EntryUiEvent : UiEvent {
     data object CreateTopicClicked : EntryUiEvent
     data class TopicClicked(val topic: Topic) : EntryUiEvent
     data class TagClearClicked(val topic: Topic) : EntryUiEvent
+    data object PlayClicked : EntryUiEvent
+    data object PauseClicked : EntryUiEvent
+    data object ResumeClicked : EntryUiEvent
+    data object AudioStopped : EntryUiEvent
 }

@@ -5,7 +5,7 @@ import androidx.room.Room
 import com.serhiiromanchuk.echojournal.data.AndroidAudioRecorder
 import com.serhiiromanchuk.echojournal.data.database.TopicDao
 import com.serhiiromanchuk.echojournal.data.database.TopicDatabase
-import com.serhiiromanchuk.echojournal.data.repository.AndroidAudioPlayer
+import com.serhiiromanchuk.echojournal.data.AndroidAudioPlayer
 import com.serhiiromanchuk.echojournal.data.repository.TopicDbRepositoryImpl
 import com.serhiiromanchuk.echojournal.domain.audio.AudioPlayer
 import com.serhiiromanchuk.echojournal.domain.audio.AudioRecorder

@@ -18,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.res.stringResource
@@ -125,7 +126,10 @@ private fun EntryScreen(
 
             MoodPlayer(
                 moodColor = uiState.currentMood.moodColor,
-                onPlayClick = {},
+                playerState = uiState.playerState,
+                onPlayClick = { onEvent(EntryUiEvent.PlayClicked) },
+                onPauseClick = { onEvent(EntryUiEvent.PauseClicked) },
+                onResumeClick = { onEvent(EntryUiEvent.ResumeClicked) },
                 modifier = Modifier.height(44.dp),
             )
 
@@ -139,6 +143,8 @@ private fun EntryScreen(
                         coordinates.positionInParent().x.toInt(),
                         coordinates.positionInParent().y.toInt() + coordinates.size.height + verticalSpace
                     )
+                }.onFocusChanged {
+                    onEvent(EntryUiEvent.TopicValueChanged(""))
                 }
             )
 

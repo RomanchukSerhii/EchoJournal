@@ -2,6 +2,7 @@ package com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.stat
 
 import com.serhiiromanchuk.echojournal.domain.entity.Topic
 import com.serhiiromanchuk.echojournal.presentation.core.base.common.UiState
+import com.serhiiromanchuk.echojournal.presentation.core.state.PlayerState
 import com.serhiiromanchuk.echojournal.presentation.core.utils.MoodUiModel
 
 data class EntryUiState(
@@ -9,6 +10,7 @@ data class EntryUiState(
     val titleValue: String = "",
     val topicValue: String = "",
     val descriptionValue: String = "",
+    val playerState: PlayerState = PlayerState(),
     val currentTopics: List<Topic> = listOf(),
     val foundTopics: List<Topic> = listOf(),
     val entrySheetState: EntrySheetState = EntrySheetState()

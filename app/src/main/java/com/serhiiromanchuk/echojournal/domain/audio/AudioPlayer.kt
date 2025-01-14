@@ -1,10 +1,14 @@
 package com.serhiiromanchuk.echojournal.domain.audio
 
-import java.io.File
+import kotlinx.coroutines.flow.StateFlow
 
 interface AudioPlayer {
-    fun playFile(file: File)
+    val currentPositionFlow: StateFlow<Int>
+    fun initializeFile(filePath: String)
+    fun play()
     fun pause()
     fun resume()
     fun stop()
+    fun setOnCompletionListener(listener: () -> Unit)
+    fun getDuration(): Int
 }

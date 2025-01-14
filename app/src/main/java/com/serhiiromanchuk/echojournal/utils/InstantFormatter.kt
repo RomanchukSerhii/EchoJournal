@@ -29,12 +29,14 @@ object InstantFormatter {
     }
 
     fun formatMillisToTime(timeMillis: Long): String {
+        val durationInSeconds = timeMillis / 1000
         val localDateTime = LocalDateTime.ofInstant(
             Instant.ofEpochMilli(timeMillis),
             zoneId
         )
+        val pattern = if (durationInSeconds < 3600) "ss:SS" else "mm:ss:SS"
         val formatter = DateTimeFormatter.ofPattern(
-            "mm:ss:SS",
+            pattern,
             Locale.getDefault()
         )
         return localDateTime.format(formatter)

@@ -1,9 +1,11 @@
 package com.serhiiromanchuk.echojournal.presentation.screens.entry
 
 import androidx.lifecycle.viewModelScope
+import com.serhiiromanchuk.echojournal.domain.audio.AudioPlayer
 import com.serhiiromanchuk.echojournal.domain.entity.Topic
 import com.serhiiromanchuk.echojournal.domain.repository.TopicDbRepository
 import com.serhiiromanchuk.echojournal.presentation.core.base.BaseViewModel
+import com.serhiiromanchuk.echojournal.presentation.core.state.PlayerState
 import com.serhiiromanchuk.echojournal.presentation.core.utils.MoodUiModel
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryActionEvent
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent
@@ -16,6 +18,7 @@ import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.Entry
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.TopicValueChanged
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.state.EntrySheetState
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.state.EntryUiState
+import com.serhiiromanchuk.echojournal.utils.InstantFormatter
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -37,6 +40,7 @@ class EntryViewModel @AssistedInject constructor(
     @Assisted val entryFilePath: String,
     @Assisted val entryId: Long,
     private val topicDbRepository: TopicDbRepository,
+    private val audioPlayer: AudioPlayer
 ) : EntryBaseViewModel() {
     override val initialState: EntryUiState
         get() = EntryUiState()
@@ -48,8 +52,8 @@ class EntryViewModel @AssistedInject constructor(
                 flowOf(emptyList())
             } else {
                 flow {
-                    val test = topicDbRepository.searchTopics(query)
-                    emit(test)
+                    val foundTopics = topicDbRepository.searchTopics(query)
+                    emit(foundTopics)
                 }
             }
         }
@@ -60,9 +64,36 @@ class EntryViewModel @AssistedInject constructor(
         )
 
     init {
+        audioPlayer.initializeFile(entryFilePath)
+
+        // Set the duration of the entry
+        val durationTime = InstantFormatter.formatMillisToTime(audioPlayer.getDuration().toLong())
+        updateState {
+            it.copy(playerState = currentState.playerState.copy(duration = durationTime))
+        }
+
+        // Set a listener to handle actions when audio playback completes.
+        audioPlayer.setOnCompletionListener {
+            updatePlayerStateAction(PlayerState.Action.Initializing)
+            audioPlayer.stop()
+        }
+
+        // Subscribe to topic search results
         launch {
             searchResults.collect {
                 updateState { it.copy(foundTopics = searchResults.value) }
+            }
+        }
+
+        // Subscribe to the current position of the entry
+        launch {
+            audioPlayer.currentPositionFlow.collect { positionMillis ->
+                val timePosition = InstantFormatter.formatMillisToTime(positionMillis.toLong())
+                updateState {
+                    it.copy(
+                        playerState = currentState.playerState.copy(currentPosition = timePosition)
+                    )
+                }
             }
         }
     }
@@ -92,8 +123,34 @@ class EntryViewModel @AssistedInject constructor(
             is EntryUiEvent.TagClearClicked -> updateState {
                 it.copy(currentTopics = currentState.currentTopics - event.topic)
             }
+
+            EntryUiEvent.PlayClicked -> playAudio()
+            EntryUiEvent.PauseClicked -> pauseAudio()
+            EntryUiEvent.ResumeClicked -> resumeAudio()
+            EntryUiEvent.AudioStopped -> stopAudio()
         }
     }
+
+    private fun playAudio() {
+        updatePlayerStateAction(PlayerState.Action.Playing)
+        audioPlayer.play()
+    }
+
+    private fun pauseAudio() {
+        updatePlayerStateAction(PlayerState.Action.Paused)
+        audioPlayer.pause()
+    }
+
+    private fun resumeAudio() {
+        updatePlayerStateAction(PlayerState.Action.Resumed)
+        audioPlayer.resume()
+    }
+
+    private fun stopAudio() {
+        updatePlayerStateAction(PlayerState.Action.Initializing)
+        audioPlayer.stop()
+    }
+
 
     private fun addNewTopic() {
         val newTopic = Topic(name = currentState.topicValue)
@@ -143,6 +200,11 @@ class EntryViewModel @AssistedInject constructor(
             isOpen = !state.isOpen,
             activeMood = activeMood
         )
+    }
+
+    private fun updatePlayerStateAction(action: PlayerState.Action) {
+        val updatedPlayerState = currentState.playerState.copy(action = action)
+        updateState { it.copy(playerState = updatedPlayerState) }
     }
 
     @AssistedFactory

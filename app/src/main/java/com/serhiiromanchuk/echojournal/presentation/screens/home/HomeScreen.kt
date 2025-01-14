@@ -49,7 +49,7 @@ fun HomeScreenRoot(
         actionsEventHandler = { _, actionEvent ->
             when (actionEvent) {
                 is HomeActionEvent.NavigateToEntryScreen ->
-                    navigationState.navigateToEntry(filePath = "test")
+                    navigationState.navigateToEntry(filePath = actionEvent.filePath)
             }
         }
     ) { uiState ->

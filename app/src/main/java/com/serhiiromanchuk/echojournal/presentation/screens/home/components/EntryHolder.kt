@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import com.serhiiromanchuk.echojournal.domain.entity.Entry
 import com.serhiiromanchuk.echojournal.presentation.core.components.ExpandableText
 import com.serhiiromanchuk.echojournal.presentation.core.components.MoodPlayer
+import com.serhiiromanchuk.echojournal.presentation.core.state.PlayerState
 import com.serhiiromanchuk.echojournal.presentation.core.utils.toUiModel
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent
 import com.serhiiromanchuk.echojournal.presentation.theme.EchoUltraLightGray
@@ -94,7 +95,10 @@ fun EntryHolder(
 
                 MoodPlayer(
                     moodColor = moodUiModel.moodColor,
-                    onPlayClick = {}
+                    playerState = PlayerState(),
+                    onPlayClick = {},
+                    onPauseClick = {},
+                    onResumeClick = {}
                 )
 
                 // Entry description

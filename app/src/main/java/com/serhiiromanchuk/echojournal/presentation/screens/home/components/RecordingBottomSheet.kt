@@ -1,4 +1,6 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3Api::class
+)
 
 package com.serhiiromanchuk.echojournal.presentation.screens.home.components
 
@@ -112,15 +114,13 @@ private fun BottomSheetHeader(
         ) {
             Text(
                 text = recordingTime,
-                style = MaterialTheme.typography.labelMedium,
-                modifier = Modifier.fillMaxWidth()
+                style = MaterialTheme.typography.labelMedium
             )
 
             // Hidden placeholder text to define a fixed width.
             Text(
                 text = "00:00:00",
-                style = MaterialTheme.typography.labelMedium.copy(color = Color.Transparent),
-                modifier = Modifier.fillMaxWidth()
+                style = MaterialTheme.typography.labelMedium.copy(color = Color.Transparent)
             )
         }
     }
