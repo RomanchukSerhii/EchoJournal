@@ -113,7 +113,7 @@ private fun BottomSheetHeader(
             modifier = Modifier.width(IntrinsicSize.Max)
         ) {
             Text(
-                text = recordingTime,
+                text = if (recordingTime.length > 5) recordingTime else "00:$recordingTime",
                 style = MaterialTheme.typography.labelMedium
             )
 
