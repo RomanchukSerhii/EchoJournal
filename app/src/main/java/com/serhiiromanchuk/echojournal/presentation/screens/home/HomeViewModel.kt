@@ -2,8 +2,6 @@ package com.serhiiromanchuk.echojournal.presentation.screens.home
 
 import android.net.Uri
 import com.serhiiromanchuk.echojournal.domain.audio.AudioRecorder
-import com.serhiiromanchuk.echojournal.domain.entity.Entry
-import com.serhiiromanchuk.echojournal.domain.entity.MoodType
 import com.serhiiromanchuk.echojournal.domain.entity.Topic
 import com.serhiiromanchuk.echojournal.presentation.core.base.BaseViewModel
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeActionEvent
@@ -58,58 +56,58 @@ class HomeViewModel @Inject constructor(
                 name = "Conundrums"
             ),
         )
-
-        val entries = mapOf(
-            Pair(
-                today, listOf(
-                    Entry(
-                        id = 4L,
-                        title = "MyEntry",
-                        description = "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.",
-                        creationTimestamp = today
-                    ),
-                    Entry(
-                        id = 3L,
-                        title = "MyEntry",
-                        moodType = MoodType.Peaceful,
-                        topics = topics,
-                        creationTimestamp = today
-                    )
-                )
-            ),
-            Pair(
-                yesterday, listOf(
-                    Entry(
-                        id = 2L,
-                        title = "MyEntry",
-                        moodType = MoodType.Sad,
-                        creationTimestamp = yesterday
-                    ),
-                    Entry(
-                        id = 1L,
-                        title = "MyEntry",
-                        moodType = MoodType.Excited,
-                        description = "It is a long established fact that a reader will be distracted by the readable content of a page.",
-                        creationTimestamp = yesterday
-                    )
-                )
-            ),
-            Pair(
-                dayBeforeYesterday, listOf(
-                    Entry(
-                        id = 0L,
-                        title = "MyEntry",
-                        moodType = MoodType.Stressed,
-                        creationTimestamp = dayBeforeYesterday
-                    ),
-                )
-            )
-        )
-        updateState {
-            it.copy(
-                entries = entries
-            )
-        }
+//
+//        val entries = mapOf(
+//            Pair(
+//                today, listOf(
+//                    Entry(
+//                        id = 4L,
+//                        title = "MyEntry",
+//                        description = "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.",
+//                        creationTimestamp = today
+//                    ),
+//                    Entry(
+//                        id = 3L,
+//                        title = "MyEntry",
+//                        moodType = MoodType.Peaceful,
+//                        topics = topics,
+//                        creationTimestamp = today
+//                    )
+//                )
+//            ),
+//            Pair(
+//                yesterday, listOf(
+//                    Entry(
+//                        id = 2L,
+//                        title = "MyEntry",
+//                        moodType = MoodType.Sad,
+//                        creationTimestamp = yesterday
+//                    ),
+//                    Entry(
+//                        id = 1L,
+//                        title = "MyEntry",
+//                        moodType = MoodType.Excited,
+//                        description = "It is a long established fact that a reader will be distracted by the readable content of a page.",
+//                        creationTimestamp = yesterday
+//                    )
+//                )
+//            ),
+//            Pair(
+//                dayBeforeYesterday, listOf(
+//                    Entry(
+//                        id = 0L,
+//                        title = "MyEntry",
+//                        moodType = MoodType.Stressed,
+//                        creationTimestamp = dayBeforeYesterday
+//                    ),
+//                )
+//            )
+//        )
+//        updateState {
+//            it.copy(
+//                entries = entries
+//            )
+//        }
     }
 
     override fun onEvent(event: HomeUiEvent) {
@@ -123,11 +121,6 @@ class HomeViewModel @Inject constructor(
             is PermissionDialogOpened -> updateState { it.copy(isPermissionDialogOpen = event.isOpen) }
         }
     }
-
-//    private fun startRecording() {
-//        toggleRecordingState()
-//        stopWatch.start()
-//    }
 
     private fun pauseRecording() {
         audioRecorder.pause()
@@ -143,19 +136,25 @@ class HomeViewModel @Inject constructor(
 
     private fun stopRecording() {
         toggleSheetState()
-        sendActionEvent(HomeActionEvent.NavigateToEntryScreen(currentState.uriFilePath))
+        sendActionEvent(
+            HomeActionEvent.NavigateToEntryScreen(
+                currentState.audioFilePath, currentState.amplitudeLogFilePath
+            )
+        )
     }
 
     private fun toggleSheetState() {
-        val updatedSheetState = currentState.homeSheetState.copy(isVisible = !currentState.homeSheetState.isVisible)
+        val updatedSheetState =
+            currentState.homeSheetState.copy(isVisible = !currentState.homeSheetState.isVisible)
 
         if (updatedSheetState.isVisible) {
             val outputFilePath = audioRecorder.createAudioFile()
-            updateState { it.copy(uriFilePath = Uri.encode(outputFilePath)) }
+            updateState { it.copy(audioFilePath = Uri.encode(outputFilePath)) }
             audioRecorder.start(outputFilePath)
             stopWatch.start()
         } else {
-            audioRecorder.stop()
+            val amplitudeLogFilePath = audioRecorder.stop()
+            updateState { it.copy(amplitudeLogFilePath = Uri.encode(amplitudeLogFilePath)) }
             stopWatch.reset()
         }
 
@@ -163,7 +162,8 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun toggleRecordingState() {
-        val updatedSheetState = currentState.homeSheetState.copy(isRecording = !currentState.homeSheetState.isRecording)
+        val updatedSheetState =
+            currentState.homeSheetState.copy(isRecording = !currentState.homeSheetState.isRecording)
         updateHomeSheetState(updatedSheetState)
     }
 

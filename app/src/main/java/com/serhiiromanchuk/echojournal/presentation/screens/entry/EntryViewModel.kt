@@ -1,11 +1,13 @@
 package com.serhiiromanchuk.echojournal.presentation.screens.entry
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.serhiiromanchuk.echojournal.domain.audio.AudioPlayer
 import com.serhiiromanchuk.echojournal.domain.entity.Topic
 import com.serhiiromanchuk.echojournal.domain.repository.TopicDbRepository
 import com.serhiiromanchuk.echojournal.presentation.core.base.BaseViewModel
 import com.serhiiromanchuk.echojournal.presentation.core.state.PlayerState
+import com.serhiiromanchuk.echojournal.presentation.core.utils.AmplitudeCalculator
 import com.serhiiromanchuk.echojournal.presentation.core.utils.MoodUiModel
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryActionEvent
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent
@@ -37,7 +39,8 @@ typealias EntryBaseViewModel = BaseViewModel<EntryUiState, EntryUiEvent, EntryAc
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel(assistedFactory = EntryViewModel.EntryViewModelFactory::class)
 class EntryViewModel @AssistedInject constructor(
-    @Assisted val entryFilePath: String,
+    @Assisted("audioFilePath") val audioFilePath: String,
+    @Assisted("amplitudeLogFilePath") val amplitudeLogFilePath: String,
     @Assisted val entryId: Long,
     private val topicDbRepository: TopicDbRepository,
     private val audioPlayer: AudioPlayer
@@ -64,7 +67,7 @@ class EntryViewModel @AssistedInject constructor(
         )
 
     init {
-        audioPlayer.initializeFile(entryFilePath)
+        audioPlayer.initializeFile(audioFilePath)
 
         // Set the duration of the entry
         val durationTime = InstantFormatter.formatMillisToTime(audioPlayer.getDuration().toLong())
@@ -128,6 +131,7 @@ class EntryViewModel @AssistedInject constructor(
             EntryUiEvent.PauseClicked -> pauseAudio()
             EntryUiEvent.ResumeClicked -> resumeAudio()
             EntryUiEvent.AudioStopped -> stopAudio()
+            is EntryUiEvent.TrackDimensionsChanged -> updateTrackDimensions(event.dimensions)
         }
     }
 
@@ -158,6 +162,29 @@ class EntryViewModel @AssistedInject constructor(
         launch {
             topicDbRepository.insertTopic(newTopic)
         }
+    }
+
+    private fun updateTrackDimensions(dimensions: PlayerState.TrackDimensions) {
+        val amplitudeCalculator = AmplitudeCalculator(
+            amplitudeLogFilePath = amplitudeLogFilePath,
+            trackWidth = dimensions.trackWidth,
+            amplitudeWidth = dimensions.amplitudeWidth,
+            spacing = dimensions.amplitudeSpacing
+        )
+        val correctedAmplitudeSpacing = amplitudeCalculator.correctedSpacing()
+        val heightCoefficients = amplitudeCalculator.heightCoefficients()
+
+        Log.d("HeightCoefficients","Height coefficients: $heightCoefficients")
+
+        val updatedPlayerState = currentState.playerState.copy(
+            trackDimensions = PlayerState.TrackDimensions(
+                trackWidth = dimensions.trackWidth,
+                amplitudeWidth = dimensions.amplitudeWidth,
+                amplitudeSpacing = correctedAmplitudeSpacing,
+                heightCoefficients = heightCoefficients
+            )
+        )
+        updateState { it.copy(playerState = updatedPlayerState) }
     }
 
     private fun updateCurrentTopics(newTopic: Topic) {
@@ -209,6 +236,10 @@ class EntryViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface EntryViewModelFactory {
-        fun create(entryFilePath: String, entryId: Long): EntryViewModel
+        fun create(
+            @Assisted("audioFilePath") entryFilePath: String,
+            @Assisted("amplitudeLogFilePath") amplitudeLogFilePath: String,
+            entryId: Long
+        ): EntryViewModel
     }
 }

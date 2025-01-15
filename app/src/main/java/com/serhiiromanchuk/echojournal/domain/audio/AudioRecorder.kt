@@ -5,5 +5,5 @@ interface AudioRecorder {
     fun start(outputFilePath: String)
     fun pause()
     fun resume()
-    fun stop()
+    fun stop(): String
 }

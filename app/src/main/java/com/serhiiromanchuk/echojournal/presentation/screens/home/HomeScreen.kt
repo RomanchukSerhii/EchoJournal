@@ -49,7 +49,10 @@ fun HomeScreenRoot(
         actionsEventHandler = { _, actionEvent ->
             when (actionEvent) {
                 is HomeActionEvent.NavigateToEntryScreen ->
-                    navigationState.navigateToEntry(filePath = actionEvent.filePath)
+                    navigationState.navigateToEntry(
+                        audioFilePath = actionEvent.audioFilePath,
+                        amplitudeLogFilePath = actionEvent.amplitudeFilePath
+                    )
             }
         }
     ) { uiState ->
@@ -60,11 +63,11 @@ fun HomeScreenRoot(
                 uiState = uiState,
                 onEvent = viewModel::onEvent
             )
-            RecordingBottomSheet(
-                homeSheetState = uiState.homeSheetState,
-                onEvent = viewModel::onEvent
-            )
         }
+        RecordingBottomSheet(
+            homeSheetState = uiState.homeSheetState,
+            onEvent = viewModel::onEvent
+        )
     }
 }
 

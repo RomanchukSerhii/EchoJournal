@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalLayoutApi::class)
+@file:OptIn(ExperimentalLayoutApi::class, ExperimentalLayoutApi::class)
 
 package com.serhiiromanchuk.echojournal.presentation.screens.home.components
 
@@ -98,7 +98,8 @@ fun EntryHolder(
                     playerState = PlayerState(),
                     onPlayClick = {},
                     onPauseClick = {},
-                    onResumeClick = {}
+                    onResumeClick = {},
+                    trackWidthChanged = {}
                 )
 
                 // Entry description

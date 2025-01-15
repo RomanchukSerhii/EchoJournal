@@ -15,8 +15,12 @@ class NavigationState(
 
     fun popBackStack() = navHostController.popBackStack()
 
-    fun navigateToEntry(filePath: String, entryId: Long = Constants.UNDEFINED_ENTRY_ID) {
-        navHostController.navigate("${Screen.Entry.route}/$filePath/$entryId")
+    fun navigateToEntry(
+        audioFilePath: String,
+        amplitudeLogFilePath: String,
+        entryId: Long = Constants.UNDEFINED_ENTRY_ID
+    ) {
+        navHostController.navigate("${Screen.Entry.route}/$audioFilePath/$amplitudeLogFilePath/$entryId")
     }
 }
 

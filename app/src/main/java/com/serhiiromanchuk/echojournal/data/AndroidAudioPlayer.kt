@@ -37,6 +37,7 @@ class AndroidAudioPlayer(
             createPlayer()
         }
         player?.start()
+        player?.metrics
         startUpdatingCurrentPosition()
     }
 

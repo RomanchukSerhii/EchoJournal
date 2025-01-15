@@ -28,12 +28,15 @@ fun NavGraphBuilder.entryRoute(
         route = Screen.Entry.routeWithArgs,
         arguments = Screen.Entry.arguments
     ) { navBackStackEntry ->
-        val entryFilePath = navBackStackEntry.arguments?.getString(Screen.Entry.FILE_PATH) ?: ""
+        val audioFilePath = navBackStackEntry.arguments?.getString(Screen.Entry.AUDIO_FILE_PATH) ?: ""
+        val amplitudeLogFilePath = navBackStackEntry.arguments?.getString(Screen.Entry.AMPLITUDE_LOG_FILE_PATH) ?: ""
         val entryId = navBackStackEntry.arguments?.getLong(Screen.Entry.ID) ?: Constants.UNDEFINED_ENTRY_ID
+
         EntryScreenRoot(
             modifier = modifier,
             navigationState = navigationState,
-            entryFilePath = entryFilePath,
+            audioFilePath = audioFilePath,
+            amplitudeLogFilePath = amplitudeLogFilePath,
             entryId = entryId
         )
     }
