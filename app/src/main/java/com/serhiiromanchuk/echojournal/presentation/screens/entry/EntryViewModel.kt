@@ -70,9 +70,14 @@ class EntryViewModel @AssistedInject constructor(
         audioPlayer.initializeFile(audioFilePath)
 
         // Set the duration of the entry
-        val durationTime = InstantFormatter.formatMillisToTime(audioPlayer.getDuration().toLong())
+        val durationText = InstantFormatter.formatMillisToTime(audioPlayer.getDuration().toLong())
         updateState {
-            it.copy(playerState = currentState.playerState.copy(duration = durationTime))
+            it.copy(
+                playerState = currentState.playerState.copy(
+                    duration = audioPlayer.getDuration(),
+                    durationText = durationText
+                )
+            )
         }
 
         // Set a listener to handle actions when audio playback completes.
@@ -91,10 +96,14 @@ class EntryViewModel @AssistedInject constructor(
         // Subscribe to the current position of the entry
         launch {
             audioPlayer.currentPositionFlow.collect { positionMillis ->
-                val timePosition = InstantFormatter.formatMillisToTime(positionMillis.toLong())
+                val currentPositionText =
+                    InstantFormatter.formatMillisToTime(positionMillis.toLong())
                 updateState {
                     it.copy(
-                        playerState = currentState.playerState.copy(currentPosition = timePosition)
+                        playerState = currentState.playerState.copy(
+                            currentPosition = positionMillis,
+                            currentPositionText = currentPositionText
+                        )
                     )
                 }
             }
@@ -174,7 +183,7 @@ class EntryViewModel @AssistedInject constructor(
         val correctedAmplitudeSpacing = amplitudeCalculator.correctedSpacing()
         val heightCoefficients = amplitudeCalculator.heightCoefficients()
 
-        Log.d("HeightCoefficients","Height coefficients: $heightCoefficients")
+        Log.d("HeightCoefficients", "Height coefficients: $heightCoefficients")
 
         val updatedPlayerState = currentState.playerState.copy(
             trackDimensions = PlayerState.TrackDimensions(
