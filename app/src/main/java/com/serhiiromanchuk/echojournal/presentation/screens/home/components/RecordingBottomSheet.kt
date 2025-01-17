@@ -51,7 +51,7 @@ fun RecordingBottomSheet(
 
     if (homeSheetState.isVisible) {
         ModalBottomSheet(
-            onDismissRequest = { onEvent(HomeUiEvent.BottomSheetToggled) },
+            onDismissRequest = { onEvent(HomeUiEvent.StopRecording(saveFile = false)) },
             sheetState = sheetState
         ) {
             Column(
@@ -69,7 +69,7 @@ fun RecordingBottomSheet(
                     onCancelClick = { onEvent(HomeUiEvent.CancelRecording) },
                     onRecordClick = {
                         if (homeSheetState.isRecording) {
-                            onEvent(HomeUiEvent.StopRecording)
+                            onEvent(HomeUiEvent.StopRecording(saveFile = true))
                         } else {
                             onEvent(HomeUiEvent.ResumeRecording)
                         }
@@ -78,7 +78,7 @@ fun RecordingBottomSheet(
                         if (homeSheetState.isRecording) {
                             onEvent(HomeUiEvent.PauseRecording)
                         } else {
-                            onEvent(HomeUiEvent.StopRecording)
+                            onEvent(HomeUiEvent.StopRecording(saveFile = false))
                         }
                     }
                 )

@@ -42,7 +42,7 @@ fun HomeScreenRoot(
         floatingActionButton = {
             HomeFAB(
                 onResult = { isGranted ->
-                    if (isGranted) viewModel.onEvent(HomeUiEvent.BottomSheetToggled)
+                    if (isGranted) viewModel.onEvent(HomeUiEvent.StartRecording)
                 }
             )
         },

@@ -75,7 +75,7 @@ fun AudioWaveform(
             val amplitudeHeight = heightCoefficient * maxAmplitudeHeight.toPx()
             val xOffset = index * (amplitudeWidthPx + correctedSpacing)
             val yOffset = (maxAmplitudeHeight.toPx() - amplitudeHeight) / 2
-            val color = if (index <= playedBars) colorPlayed else colorRemaining
+            val color = if (index < playedBars) colorPlayed else colorRemaining
 
             if (xOffset + amplitudeWidthPx <= totalWidth) {
                 drawRoundRect(

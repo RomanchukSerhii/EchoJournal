@@ -1,9 +1,9 @@
 package com.serhiiromanchuk.echojournal.domain.audio
 
 interface AudioRecorder {
-    fun createAudioFile(): String
-    fun start(outputFilePath: String)
+    fun start()
     fun pause()
     fun resume()
-    fun stop(): String
+    fun stop(saveFile: Boolean): String
+    fun getAmplitudeLogFilePath(): String
 }

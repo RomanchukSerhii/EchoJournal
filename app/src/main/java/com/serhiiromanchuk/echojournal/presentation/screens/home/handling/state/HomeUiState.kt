@@ -9,6 +9,4 @@ data class HomeUiState(
     val filterState: FilterState = FilterState(),
     val homeSheetState: HomeSheetState = HomeSheetState(),
     val isPermissionDialogOpen: Boolean = false,
-    val audioFilePath: String = "",
-    val amplitudeLogFilePath: String = ""
 ) : UiState

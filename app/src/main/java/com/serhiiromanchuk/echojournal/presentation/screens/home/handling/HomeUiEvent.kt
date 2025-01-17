@@ -4,15 +4,13 @@ import com.serhiiromanchuk.echojournal.presentation.core.base.common.UiEvent
 
 sealed interface HomeUiEvent : UiEvent {
 
-    data object BottomSheetToggled : HomeUiEvent
-
     data object StartRecording : HomeUiEvent
 
     data object PauseRecording : HomeUiEvent
 
     data object ResumeRecording : HomeUiEvent
 
-    data object StopRecording : HomeUiEvent
+    data class StopRecording(val saveFile: Boolean) : HomeUiEvent
 
     data object CancelRecording : HomeUiEvent
 

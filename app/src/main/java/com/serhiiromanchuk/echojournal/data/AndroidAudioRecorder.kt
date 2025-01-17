@@ -20,6 +20,7 @@ class AndroidAudioRecorder @Inject constructor(
 ) : AudioRecorder {
 
     private val scope = CoroutineScope(Dispatchers.IO)
+    private val outputDir = context.getExternalFilesDir(Environment.DIRECTORY_MUSIC)
 
     private var recorder: MediaRecorder? = null
     private var audioFile: File? = null
@@ -34,16 +35,10 @@ class AndroidAudioRecorder @Inject constructor(
         } else MediaRecorder()
     }
 
-    override fun createAudioFile(): String {
-        val fileName = "audio_${System.currentTimeMillis()}.mp3"
-        val outputDir = context.getExternalFilesDir(Environment.DIRECTORY_MUSIC)
-        audioFile = File(outputDir, fileName)
-        return audioFile?.absolutePath ?: ""
-    }
-
-    override fun start(outputFilePath: String) {
-        val amplitudeLogFileName = "amplitude_log_${System.currentTimeMillis()}.txt"
-        val outputDir = context.getExternalFilesDir(Environment.DIRECTORY_MUSIC)
+    override fun start() {
+        val audioFileName = "temp_${System.currentTimeMillis()}.mp3"
+        val amplitudeLogFileName = "temp_log_${System.currentTimeMillis()}.txt"
+        audioFile = File(outputDir, audioFileName)
         amplitudeLogFile = File(outputDir, amplitudeLogFileName)
 
         createRecorder().apply {
@@ -52,7 +47,7 @@ class AndroidAudioRecorder @Inject constructor(
             setAudioSamplingRate(44100)
             setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
             setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-            setOutputFile(outputFilePath)
+            setOutputFile(audioFile?.absolutePath)
 
             prepare()
             start()
@@ -65,27 +60,50 @@ class AndroidAudioRecorder @Inject constructor(
     }
 
     override fun pause() {
-        recorder?.pause() ?: throw IllegalStateException("Recorder is not initialized. Call `start()` first.")
+        recorder?.pause() ?: checkRecorderInitialized()
         isCurrentlyPaused = true
     }
 
     override fun resume() {
-        recorder?.resume() ?: throw IllegalStateException("Recorder is not initialized. Call `start()` first.")
+        recorder?.resume() ?: checkRecorderInitialized()
         isCurrentlyPaused = false
     }
 
-    override fun stop(): String {
+    override fun stop(saveFile: Boolean): String {
         amplitudeJob?.cancel()
         recorder?.apply {
             stop()
             reset()
             release()
-        }
+        } ?: checkRecorderInitialized()
         recorder = null
         isCurrentlyRecording = false
 
-        return amplitudeLogFile?.absolutePath
-            ?: throw IllegalStateException("Amplitude log file was not created. Ensure `start()` was called before `stop()`.")
+        audioFile?.let { file ->
+            if (!saveFile) {
+                file.delete()
+                amplitudeLogFile?.delete()
+                return ""
+            } else {
+                val renamedFile = renameFile(file, "audio")
+                return renamedFile.absolutePath
+            }
+        } ?: throw IllegalStateException("Audio file was not created. Ensure `start()` was called before `stop()`.")
+    }
+
+    override fun getAmplitudeLogFilePath(): String {
+        amplitudeLogFile?.let { file ->
+            val renamedFile = renameFile(file, "amplitude")
+            return renamedFile.absolutePath
+        } ?: throw IllegalStateException("Amplitude log file was not created. Ensure `start()` was called before `stop()`.")
+    }
+
+    private fun renameFile(file: File, newValue: String): File {
+        val newFileName = file.name.replace("temp", newValue)
+        val newFile = File(outputDir, newFileName)
+        val isRenamed = file.renameTo(newFile)
+
+        return if (isRenamed) newFile else throw IllegalStateException("Failed to rename audio file.")
     }
 
     private fun startLoggingAmplitude() {
@@ -102,6 +120,10 @@ class AndroidAudioRecorder @Inject constructor(
                 delay(100)
             }
         }
+    }
+
+    private fun checkRecorderInitialized() {
+        recorder ?: throw IllegalStateException("Recorder is not initialized. Call `start()` first.")
     }
 
     private fun isRecording(): Boolean = isCurrentlyRecording
