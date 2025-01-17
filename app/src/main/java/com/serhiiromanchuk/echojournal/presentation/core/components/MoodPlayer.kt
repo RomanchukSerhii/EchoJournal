@@ -1,6 +1,5 @@
 package com.serhiiromanchuk.echojournal.presentation.core.components
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.serhiiromanchuk.echojournal.R
@@ -41,7 +39,6 @@ fun MoodPlayer(
     onPlayClick: () -> Unit,
     onPauseClick: () -> Unit,
     onResumeClick: () -> Unit,
-    trackWidthChanged: (Float) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(
@@ -54,11 +51,6 @@ fun MoodPlayer(
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
-            Log.d(
-                "MoodPlayer",
-                "amplitude list size - ${playerState.trackDimensions.heightCoefficients}"
-            )
 
             // Play button
             Surface(
@@ -90,28 +82,13 @@ fun MoodPlayer(
             }
 
             AudioWaveform(
-                amplitudes = playerState.trackDimensions.heightCoefficients,
-                width = playerState.trackDimensions.amplitudeWidth,
-                spacing = playerState.trackDimensions.amplitudeSpacing,
+                amplitudeLogFilePath = playerState.amplitudeLogFilePath,
                 playbackPosition = playerState.currentPosition,
                 totalDuration = playerState.duration,
                 colorPlayed = moodColor.button,
                 colorRemaining = moodColor.track,
-                modifier = Modifier
-                    .weight(1f)
-                    .onSizeChanged {
-                        trackWidthChanged(it.width.toFloat())
-                    }
+                modifier = Modifier.weight(1f)
             )
-//            Box(
-//                modifier = Modifier
-//                    .weight(1f)
-//                    .height(4.dp)
-//                    .background(moodColor.track, CircleShape)
-//                    .onSizeChanged {
-//                        trackWidthChanged(it.width.toFloat())
-//                    }
-//            )
 
             PlayerTimer(
                 duration = playerState.durationText,

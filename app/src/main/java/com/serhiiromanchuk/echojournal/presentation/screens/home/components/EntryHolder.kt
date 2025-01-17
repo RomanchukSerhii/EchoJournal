@@ -98,8 +98,7 @@ fun EntryHolder(
                     playerState = PlayerState(),
                     onPlayClick = {},
                     onPauseClick = {},
-                    onResumeClick = {},
-                    trackWidthChanged = {}
+                    onResumeClick = {}
                 )
 
                 // Entry description

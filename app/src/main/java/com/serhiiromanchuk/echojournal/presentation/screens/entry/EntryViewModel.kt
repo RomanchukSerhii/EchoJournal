@@ -1,22 +1,27 @@
 package com.serhiiromanchuk.echojournal.presentation.screens.entry
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.serhiiromanchuk.echojournal.domain.audio.AudioPlayer
 import com.serhiiromanchuk.echojournal.domain.entity.Topic
 import com.serhiiromanchuk.echojournal.domain.repository.TopicDbRepository
 import com.serhiiromanchuk.echojournal.presentation.core.base.BaseViewModel
 import com.serhiiromanchuk.echojournal.presentation.core.state.PlayerState
-import com.serhiiromanchuk.echojournal.presentation.core.utils.AmplitudeCalculator
 import com.serhiiromanchuk.echojournal.presentation.core.utils.MoodUiModel
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryActionEvent
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.AudioStopped
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.BottomSheetClosed
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.BottomSheetOpened
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.CreateTopicClicked
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.DescriptionValueChanged
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.MoodSelected
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.PauseClicked
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.PlayClicked
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.ResumeClicked
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.SheetConfirmedClicked
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.TagClearClicked
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.TitleValueChanged
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.TopicClicked
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.TopicValueChanged
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.state.EntrySheetState
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.state.EntryUiState
@@ -69,13 +74,14 @@ class EntryViewModel @AssistedInject constructor(
     init {
         audioPlayer.initializeFile(audioFilePath)
 
-        // Set the duration of the entry
+        // Set the duration of the entry and amplitude log file path
         val durationText = InstantFormatter.formatMillisToTime(audioPlayer.getDuration().toLong())
         updateState {
             it.copy(
                 playerState = currentState.playerState.copy(
                     duration = audioPlayer.getDuration(),
-                    durationText = durationText
+                    durationText = durationText,
+                    amplitudeLogFilePath = amplitudeLogFilePath
                 )
             )
         }
@@ -115,32 +121,26 @@ class EntryViewModel @AssistedInject constructor(
             BottomSheetClosed -> updateState {
                 it.copy(entrySheetState = toggleSheetState(currentState.entrySheetState))
             }
-
             is BottomSheetOpened -> updateState {
-                it.copy(
-                    entrySheetState = toggleSheetState(
-                        currentState.entrySheetState,
-                        event.mood
-                    )
-                )
+                it.copy(entrySheetState = toggleSheetState(currentState.entrySheetState, event.mood))
             }
+            is SheetConfirmedClicked -> setCurrentMood(event.mood)
 
             is MoodSelected -> updateActiveMood(event.mood)
-            is SheetConfirmedClicked -> setCurrentMood(event.mood)
             is TitleValueChanged -> updateState { it.copy(titleValue = event.value) }
-            is TopicValueChanged -> updateTopic(event.value)
             is DescriptionValueChanged -> updateState { it.copy(descriptionValue = event.value) }
-            EntryUiEvent.CreateTopicClicked -> addNewTopic()
-            is EntryUiEvent.TopicClicked -> updateCurrentTopics(event.topic)
-            is EntryUiEvent.TagClearClicked -> updateState {
+
+            is TopicValueChanged -> updateTopic(event.value)
+            is TagClearClicked -> updateState {
                 it.copy(currentTopics = currentState.currentTopics - event.topic)
             }
+            is TopicClicked -> updateCurrentTopics(event.topic)
+            CreateTopicClicked -> addNewTopic()
 
-            EntryUiEvent.PlayClicked -> playAudio()
-            EntryUiEvent.PauseClicked -> pauseAudio()
-            EntryUiEvent.ResumeClicked -> resumeAudio()
-            EntryUiEvent.AudioStopped -> stopAudio()
-            is EntryUiEvent.TrackDimensionsChanged -> updateTrackDimensions(event.dimensions)
+            PlayClicked -> playAudio()
+            PauseClicked -> pauseAudio()
+            ResumeClicked -> resumeAudio()
+            AudioStopped -> stopAudio()
         }
     }
 
@@ -171,29 +171,6 @@ class EntryViewModel @AssistedInject constructor(
         launch {
             topicDbRepository.insertTopic(newTopic)
         }
-    }
-
-    private fun updateTrackDimensions(dimensions: PlayerState.TrackDimensions) {
-        val amplitudeCalculator = AmplitudeCalculator(
-            amplitudeLogFilePath = amplitudeLogFilePath,
-            trackWidth = dimensions.trackWidth,
-            amplitudeWidth = dimensions.amplitudeWidth,
-            spacing = dimensions.amplitudeSpacing
-        )
-        val correctedAmplitudeSpacing = amplitudeCalculator.correctedSpacing()
-        val heightCoefficients = amplitudeCalculator.heightCoefficients()
-
-        Log.d("HeightCoefficients", "Height coefficients: $heightCoefficients")
-
-        val updatedPlayerState = currentState.playerState.copy(
-            trackDimensions = PlayerState.TrackDimensions(
-                trackWidth = dimensions.trackWidth,
-                amplitudeWidth = dimensions.amplitudeWidth,
-                amplitudeSpacing = correctedAmplitudeSpacing,
-                heightCoefficients = heightCoefficients
-            )
-        )
-        updateState { it.copy(playerState = updatedPlayerState) }
     }
 
     private fun updateCurrentTopics(newTopic: Topic) {

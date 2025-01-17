@@ -6,7 +6,7 @@ data class PlayerState(
     val currentPosition: Int = 0,
     val currentPositionText: String = "",
     val action: Action = Action.Initializing,
-    val trackDimensions: TrackDimensions = TrackDimensions()
+    val amplitudeLogFilePath: String = ""
 ) {
 
     sealed interface Action {
@@ -15,11 +15,4 @@ data class PlayerState(
         data object Paused : Action
         data object Resumed : Action
     }
-
-    data class TrackDimensions(
-        val trackWidth: Float = 0f,
-        val amplitudeWidth: Float = 0f,
-        val amplitudeSpacing: Float = 0f,
-        val heightCoefficients: List<Float> = listOf()
-    )
 }

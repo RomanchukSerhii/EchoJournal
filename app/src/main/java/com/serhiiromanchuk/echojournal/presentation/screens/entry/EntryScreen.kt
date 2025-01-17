@@ -21,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -31,7 +30,6 @@ import com.serhiiromanchuk.echojournal.navigation.NavigationState
 import com.serhiiromanchuk.echojournal.presentation.core.base.BaseContentLayout
 import com.serhiiromanchuk.echojournal.presentation.core.components.AppTopBar
 import com.serhiiromanchuk.echojournal.presentation.core.components.MoodPlayer
-import com.serhiiromanchuk.echojournal.presentation.core.state.PlayerState
 import com.serhiiromanchuk.echojournal.presentation.core.utils.toDp
 import com.serhiiromanchuk.echojournal.presentation.core.utils.toInt
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.EntryBottomButtons
@@ -100,7 +98,6 @@ private fun EntryScreen(
     onEvent: (EntryUiEvent) -> Unit
 ) {
     Box {
-        val destiny = LocalDensity.current
         var topicOffset by remember { mutableStateOf(IntOffset.Zero) }
 
         // Will be used to calculate the y-axis offset of the topicOffset
@@ -134,20 +131,6 @@ private fun EntryScreen(
                 onPlayClick = { onEvent(EntryUiEvent.PlayClicked) },
                 onPauseClick = { onEvent(EntryUiEvent.PauseClicked) },
                 onResumeClick = { onEvent(EntryUiEvent.ResumeClicked) },
-                trackWidthChanged = { trackWidth ->
-                    val (amplitudeWidth, amplitudeSpacing) = with(destiny) {
-                        4.5.dp.toPx() to 2.5.dp.toPx()
-                    }
-                    onEvent(
-                        EntryUiEvent.TrackDimensionsChanged(
-                            dimensions = PlayerState.TrackDimensions(
-                                trackWidth = trackWidth,
-                                amplitudeWidth = amplitudeWidth,
-                                amplitudeSpacing = amplitudeSpacing
-                            )
-                        )
-                    )
-                },
                 modifier = Modifier.height(44.dp),
             )
 
