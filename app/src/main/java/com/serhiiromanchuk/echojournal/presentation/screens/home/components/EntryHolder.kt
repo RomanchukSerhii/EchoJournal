@@ -47,22 +47,22 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import com.serhiiromanchuk.echojournal.domain.entity.Entry
 import com.serhiiromanchuk.echojournal.presentation.core.components.ExpandableText
 import com.serhiiromanchuk.echojournal.presentation.core.components.MoodPlayer
-import com.serhiiromanchuk.echojournal.presentation.core.state.PlayerState
 import com.serhiiromanchuk.echojournal.presentation.core.utils.toUiModel
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.HomeUiState.EntryHolderState
 import com.serhiiromanchuk.echojournal.presentation.theme.EchoUltraLightGray
 import com.serhiiromanchuk.echojournal.utils.InstantFormatter
 
 @Composable
 fun EntryHolder(
-    entry: Entry,
+    entryState: EntryHolderState,
     entryPosition: EntryListPosition,
     onEvent: (HomeUiEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val entry = entryState.entry
     val moodUiModel = entry.moodType.toUiModel()
     Row(
         modifier = modifier.height(IntrinsicSize.Max)
@@ -95,7 +95,7 @@ fun EntryHolder(
 
                 MoodPlayer(
                     moodColor = moodUiModel.moodColor,
-                    playerState = PlayerState(),
+                    playerState = entryState.playerState,
                     onPlayClick = {},
                     onPauseClick = {},
                     onResumeClick = {}
@@ -123,7 +123,7 @@ fun EntryHolder(
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         entry.topics.forEach { topic ->
-                            TopicChip(title = topic.name)
+                            TopicChip(title = topic)
                         }
                     }
                 }

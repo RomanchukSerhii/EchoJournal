@@ -85,25 +85,15 @@ class AndroidAudioRecorder @Inject constructor(
                 amplitudeLogFile?.delete()
                 return ""
             } else {
-                val renamedFile = renameFile(file, "audio")
-                return renamedFile.absolutePath
+                return file.absolutePath
             }
         } ?: throw IllegalStateException("Audio file was not created. Ensure `start()` was called before `stop()`.")
     }
 
     override fun getAmplitudeLogFilePath(): String {
         amplitudeLogFile?.let { file ->
-            val renamedFile = renameFile(file, "amplitude")
-            return renamedFile.absolutePath
+           return file.absolutePath
         } ?: throw IllegalStateException("Amplitude log file was not created. Ensure `start()` was called before `stop()`.")
-    }
-
-    private fun renameFile(file: File, newValue: String): File {
-        val newFileName = file.name.replace("temp", newValue)
-        val newFile = File(outputDir, newFileName)
-        val isRenamed = file.renameTo(newFile)
-
-        return if (isRenamed) newFile else throw IllegalStateException("Failed to rename audio file.")
     }
 
     private fun startLoggingAmplitude() {

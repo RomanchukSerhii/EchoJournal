@@ -10,14 +10,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.serhiiromanchuk.echojournal.domain.entity.Entry
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.HomeUiState.*
 import com.serhiiromanchuk.echojournal.utils.InstantFormatter
 import java.time.Instant
 
 @Composable
 fun JournalEntries(
-    entryNotes: Map<Instant, List<Entry>>,
+    entryNotes: Map<Instant, List<EntryHolderState>>,
     onEvent: (HomeUiEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -35,13 +35,13 @@ fun JournalEntries(
                 )
             }
 
-            items(items = entries, key = { entry -> entry.id }) { entry ->
+            items(items = entries, key = { entryState -> entryState.entry.id }) { entryHolderState ->
                 EntryHolder(
-                    entry = entry,
+                    entryState = entryHolderState,
                     entryPosition = when {
                         entries.size == 1 -> EntryListPosition.Single
-                        entry == entries.first() -> EntryListPosition.First
-                        entry == entries.last() -> EntryListPosition.Last
+                        entryHolderState == entries.first() -> EntryListPosition.First
+                        entryHolderState == entries.last() -> EntryListPosition.Last
                         else -> EntryListPosition.Middle
                     },
                     onEvent = onEvent

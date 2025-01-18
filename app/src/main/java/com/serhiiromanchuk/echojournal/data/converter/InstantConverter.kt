@@ -5,9 +5,8 @@ import java.time.Instant
 
 class InstantConverter {
     @TypeConverter
-    fun fromTimestamp(value: Long) = Instant.ofEpochMilli(value)
-
+    fun fromInstant(instant: Instant): Long = instant.toEpochMilli()
 
     @TypeConverter
-    fun instantToTimestamp(instant: Instant) = instant.toEpochMilli()
+    fun toInstant(value: Long): Instant = Instant.ofEpochMilli(value)
 }

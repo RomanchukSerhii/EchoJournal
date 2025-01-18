@@ -2,6 +2,7 @@ package com.serhiiromanchuk.echojournal.presentation.screens.home
 
 import android.net.Uri
 import com.serhiiromanchuk.echojournal.domain.audio.AudioRecorder
+import com.serhiiromanchuk.echojournal.domain.repository.EntryRepository
 import com.serhiiromanchuk.echojournal.presentation.core.base.BaseViewModel
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeActionEvent
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent
@@ -16,12 +17,15 @@ import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.
 import com.serhiiromanchuk.echojournal.utils.StopWatch
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import java.time.ZoneId
+import java.time.ZoneOffset
 import javax.inject.Inject
 
 private typealias HomeBaseViewModel = BaseViewModel<HomeUiState, HomeUiEvent, HomeActionEvent>
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+    private val entryRepository: EntryRepository,
     private val audioRecorder: AudioRecorder
 ) : HomeBaseViewModel() {
     override val initialState: HomeUiState
@@ -29,6 +33,23 @@ class HomeViewModel @Inject constructor(
 
     private val stopWatch = StopWatch()
     private var stopWatchJob: Job? = null
+
+    init {
+        launch {
+            entryRepository.getEntries().collect { entries ->
+                val sortedEntries = entries
+                    .groupBy { entry ->
+                        val localDate =
+                            entry.creationTimestamp.atZone(ZoneId.systemDefault()).toLocalDate()
+                        localDate.atStartOfDay(ZoneOffset.UTC).toInstant()
+                    }
+                    .mapValues { (_, entryList) ->
+                        entryList.map { HomeUiState.EntryHolderState(it) }
+                    }
+                updateState { it.copy(entries = sortedEntries) }
+            }
+        }
+    }
 
     override fun onEvent(event: HomeUiEvent) {
         when (event) {

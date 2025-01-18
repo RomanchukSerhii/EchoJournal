@@ -6,10 +6,14 @@ import com.serhiiromanchuk.echojournal.data.AndroidAudioRecorder
 import com.serhiiromanchuk.echojournal.data.database.TopicDao
 import com.serhiiromanchuk.echojournal.data.database.TopicDatabase
 import com.serhiiromanchuk.echojournal.data.AndroidAudioPlayer
-import com.serhiiromanchuk.echojournal.data.repository.TopicDbRepositoryImpl
+import com.serhiiromanchuk.echojournal.data.database.EntryDao
+import com.serhiiromanchuk.echojournal.data.database.EntryDatabase
+import com.serhiiromanchuk.echojournal.data.repository.EntryRepositoryImpl
+import com.serhiiromanchuk.echojournal.data.repository.TopicRepositoryImpl
 import com.serhiiromanchuk.echojournal.domain.audio.AudioPlayer
 import com.serhiiromanchuk.echojournal.domain.audio.AudioRecorder
-import com.serhiiromanchuk.echojournal.domain.repository.TopicDbRepository
+import com.serhiiromanchuk.echojournal.domain.repository.EntryRepository
+import com.serhiiromanchuk.echojournal.domain.repository.TopicRepository
 import com.serhiiromanchuk.echojournal.utils.Constants
 import dagger.Module
 import dagger.Provides
@@ -24,7 +28,7 @@ object AppProvidesModule {
 
     @Provides
     @Singleton
-    fun provideDatabase(
+    fun provideTopicDatabase(
         @ApplicationContext context: Context
     ): TopicDatabase {
         return Room.databaseBuilder(
@@ -36,12 +40,33 @@ object AppProvidesModule {
 
     @Provides
     @Singleton
+    fun provideEntryDatabase(
+        @ApplicationContext context: Context
+    ): EntryDatabase {
+        return Room.databaseBuilder(
+            context,
+            EntryDatabase::class.java,
+            Constants.ENTRY_DB
+        ).build()
+    }
+
+    @Provides
+    @Singleton
     fun provideTopicDao(database: TopicDatabase): TopicDao = database.getTopicDao()
 
     @Provides
-    fun provideTopicDbRepository(
+    fun provideTopicRepository(
         topicDao: TopicDao
-    ): TopicDbRepository = TopicDbRepositoryImpl(topicDao)
+    ): TopicRepository = TopicRepositoryImpl(topicDao)
+
+    @Provides
+    @Singleton
+    fun provideEntryDao(database: EntryDatabase): EntryDao = database.getEntryDao()
+
+    @Provides
+    fun provideEntryRepository(
+        entryDao: EntryDao
+    ): EntryRepository = EntryRepositoryImpl(entryDao)
 
     @Provides
     @Singleton

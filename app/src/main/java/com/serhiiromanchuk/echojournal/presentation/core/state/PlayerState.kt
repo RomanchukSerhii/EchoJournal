@@ -1,13 +1,15 @@
 package com.serhiiromanchuk.echojournal.presentation.core.state
 
+import com.serhiiromanchuk.echojournal.utils.InstantFormatter
+
 data class PlayerState(
     val duration: Int = 0,
-    val durationText: String = "",
     val currentPosition: Int = 0,
-    val currentPositionText: String = "",
+    val currentPositionText: String = "00:00",
     val action: Action = Action.Initializing,
     val amplitudeLogFilePath: String = ""
 ) {
+    val durationText = InstantFormatter.formatMillisToTime(duration.toLong())
 
     sealed interface Action {
         data object Initializing : Action

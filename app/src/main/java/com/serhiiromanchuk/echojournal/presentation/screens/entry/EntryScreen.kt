@@ -1,5 +1,6 @@
 package com.serhiiromanchuk.echojournal.presentation.screens.entry
 
+import android.os.Environment
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -38,6 +40,7 @@ import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.Ent
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.MoodChooseButton
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.TopicDropdown
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.TopicTextField
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryActionEvent
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.state.EntryUiState
 
@@ -58,7 +61,9 @@ fun EntryScreenRoot(
         modifier = modifier,
         viewModel = viewModel,
         actionsEventHandler = { context, actionEvent ->
-
+            when (actionEvent) {
+                EntryActionEvent.NavigateBack -> navigationState.popBackStack()
+            }
         },
         topBar = {
             AppTopBar(
@@ -71,10 +76,14 @@ fun EntryScreenRoot(
             )
         },
         bottomBar = { uiState ->
+            val context = LocalContext.current
             EntryBottomButtons(
                 primaryButtonText = stringResource(R.string.save),
                 onCancelClick = {},
-                onConfirmClick = {},
+                onConfirmClick = {
+                    val outputDir = context.getExternalFilesDir(Environment.DIRECTORY_MUSIC)
+                    viewModel.onEvent(EntryUiEvent.SaveButtonClicked(outputDir!!))
+                },
                 modifier = Modifier.padding(16.dp),
                 primaryButtonEnabled = uiState.isSaveButtonEnabled
             )
@@ -177,3 +186,11 @@ private fun EntryScreen(
         )
     }
 }
+
+//private fun renameFile(file: File, newValue: String): File {
+//    val newFileName = file.name.replace("temp", newValue)
+//    val newFile = File(outputDir, newFileName)
+//    val isRenamed = file.renameTo(newFile)
+//
+//    return if (isRenamed) newFile else throw IllegalStateException("Failed to rename audio file.")
+//}

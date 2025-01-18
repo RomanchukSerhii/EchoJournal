@@ -2,14 +2,16 @@ package com.serhiiromanchuk.echojournal.presentation.screens.entry
 
 import androidx.lifecycle.viewModelScope
 import com.serhiiromanchuk.echojournal.domain.audio.AudioPlayer
+import com.serhiiromanchuk.echojournal.domain.entity.Entry
 import com.serhiiromanchuk.echojournal.domain.entity.Topic
-import com.serhiiromanchuk.echojournal.domain.repository.TopicDbRepository
+import com.serhiiromanchuk.echojournal.domain.repository.EntryRepository
+import com.serhiiromanchuk.echojournal.domain.repository.TopicRepository
 import com.serhiiromanchuk.echojournal.presentation.core.base.BaseViewModel
 import com.serhiiromanchuk.echojournal.presentation.core.state.PlayerState
 import com.serhiiromanchuk.echojournal.presentation.core.utils.MoodUiModel
+import com.serhiiromanchuk.echojournal.presentation.core.utils.toMoodType
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryActionEvent
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent
-import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.AudioStopped
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.BottomSheetClosed
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.BottomSheetOpened
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.CreateTopicClicked
@@ -38,6 +40,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
+import java.io.File
 
 typealias EntryBaseViewModel = BaseViewModel<EntryUiState, EntryUiEvent, EntryActionEvent>
 
@@ -47,7 +50,8 @@ class EntryViewModel @AssistedInject constructor(
     @Assisted("audioFilePath") val audioFilePath: String,
     @Assisted("amplitudeLogFilePath") val amplitudeLogFilePath: String,
     @Assisted val entryId: Long,
-    private val topicDbRepository: TopicDbRepository,
+    private val entryRepository: EntryRepository,
+    private val topicRepository: TopicRepository,
     private val audioPlayer: AudioPlayer
 ) : EntryBaseViewModel() {
     override val initialState: EntryUiState
@@ -60,7 +64,7 @@ class EntryViewModel @AssistedInject constructor(
                 flowOf(emptyList())
             } else {
                 flow {
-                    val foundTopics = topicDbRepository.searchTopics(query)
+                    val foundTopics = topicRepository.searchTopics(query)
                     emit(foundTopics)
                 }
             }
@@ -74,13 +78,10 @@ class EntryViewModel @AssistedInject constructor(
     init {
         audioPlayer.initializeFile(audioFilePath)
 
-        // Set the duration of the entry and amplitude log file path
-        val durationText = InstantFormatter.formatMillisToTime(audioPlayer.getDuration().toLong())
         updateState {
             it.copy(
                 playerState = currentState.playerState.copy(
                     duration = audioPlayer.getDuration(),
-                    durationText = durationText,
                     amplitudeLogFilePath = amplitudeLogFilePath
                 )
             )
@@ -140,7 +141,28 @@ class EntryViewModel @AssistedInject constructor(
             PlayClicked -> playAudio()
             PauseClicked -> pauseAudio()
             ResumeClicked -> resumeAudio()
-            AudioStopped -> stopAudio()
+            is EntryUiEvent.SaveButtonClicked -> saveEntry(event.outputDir)
+        }
+    }
+
+    private fun saveEntry(outputDir: File) {
+        val newAudioFilePath = renameFile(outputDir, audioFilePath, "audio")
+        val newAmplitudeLogFilePath = renameFile(outputDir, amplitudeLogFilePath, "amplitude")
+        val topics = currentState.currentTopics.map { it.name }
+
+        val newEntry = Entry(
+            title = currentState.titleValue,
+            moodType = currentState.currentMood.toMoodType(),
+            audioFilePath = newAudioFilePath,
+            audioDuration = currentState.playerState.duration,
+            amplitudeLogFilePath = newAmplitudeLogFilePath,
+            description = currentState.descriptionValue,
+            topics = topics
+        )
+
+        launch {
+            entryRepository.upsertEntry(newEntry)
+            sendActionEvent(EntryActionEvent.NavigateBack)
         }
     }
 
@@ -159,17 +181,11 @@ class EntryViewModel @AssistedInject constructor(
         audioPlayer.resume()
     }
 
-    private fun stopAudio() {
-        updatePlayerStateAction(PlayerState.Action.Initializing)
-        audioPlayer.stop()
-    }
-
-
     private fun addNewTopic() {
         val newTopic = Topic(name = currentState.topicValue)
         updateCurrentTopics(newTopic)
         launch {
-            topicDbRepository.insertTopic(newTopic)
+            topicRepository.insertTopic(newTopic)
         }
     }
 
@@ -218,6 +234,15 @@ class EntryViewModel @AssistedInject constructor(
     private fun updatePlayerStateAction(action: PlayerState.Action) {
         val updatedPlayerState = currentState.playerState.copy(action = action)
         updateState { it.copy(playerState = updatedPlayerState) }
+    }
+
+    private fun renameFile(outputDir: File, filePath: String, newValue: String): String {
+        val file = File(filePath)
+        val newFileName = file.name.replace("temp", newValue)
+        val newFile = File(outputDir, newFileName)
+        val isRenamed = file.renameTo(newFile)
+
+        return if (isRenamed) newFile.absolutePath else throw IllegalStateException("Failed to rename ${file.name}.")
     }
 
     @AssistedFactory

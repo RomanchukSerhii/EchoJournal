@@ -3,6 +3,7 @@ package com.serhiiromanchuk.echojournal.presentation.screens.entry.handling
 import com.serhiiromanchuk.echojournal.domain.entity.Topic
 import com.serhiiromanchuk.echojournal.presentation.core.base.common.UiEvent
 import com.serhiiromanchuk.echojournal.presentation.core.utils.MoodUiModel
+import java.io.File
 
 sealed interface EntryUiEvent : UiEvent {
     data object BottomSheetClosed : EntryUiEvent
@@ -18,5 +19,5 @@ sealed interface EntryUiEvent : UiEvent {
     data object PlayClicked : EntryUiEvent
     data object PauseClicked : EntryUiEvent
     data object ResumeClicked : EntryUiEvent
-    data object AudioStopped : EntryUiEvent
+    data class SaveButtonClicked(val outputDir: File) : EntryUiEvent
 }
