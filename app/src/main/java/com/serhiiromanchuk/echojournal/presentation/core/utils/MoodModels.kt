@@ -3,6 +3,11 @@ package com.serhiiromanchuk.echojournal.presentation.core.utils
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import com.serhiiromanchuk.echojournal.R
+import com.serhiiromanchuk.echojournal.presentation.core.utils.MoodUiModel.Excited
+import com.serhiiromanchuk.echojournal.presentation.core.utils.MoodUiModel.Neutral
+import com.serhiiromanchuk.echojournal.presentation.core.utils.MoodUiModel.Peaceful
+import com.serhiiromanchuk.echojournal.presentation.core.utils.MoodUiModel.Sad
+import com.serhiiromanchuk.echojournal.presentation.core.utils.MoodUiModel.Stressed
 import com.serhiiromanchuk.echojournal.presentation.theme.MoodExcited35
 import com.serhiiromanchuk.echojournal.presentation.theme.MoodExcited80
 import com.serhiiromanchuk.echojournal.presentation.theme.MoodExcited95
@@ -110,13 +115,9 @@ sealed class MoodUiModel(
         )
     )
 
-    fun getAllMoods(): List<MoodUiModel> {
-        return listOf(
-            Stressed,
-            Sad,
-            Neutral,
-            Peaceful,
-            Excited
+    companion object {
+        val allMoods: List<MoodUiModel> = listOf(
+            Excited, Neutral, Peaceful, Sad, Stressed
         )
     }
 }
@@ -132,3 +133,14 @@ data class MoodIcons(
     val stroke: Int = Constants.UNDEFINED_MOOD_ICON_RES,
     val outline: Int = Constants.UNDEFINED_MOOD_ICON_RES
 )
+
+fun String.toMoodUiModel(): MoodUiModel {
+    return when (this) {
+        Excited.title -> Excited
+        Neutral.title -> Neutral
+        Peaceful.title -> Peaceful
+        Sad.title -> Sad
+        Stressed.title -> Stressed
+        else -> MoodUiModel.Undefined
+    }
+}
