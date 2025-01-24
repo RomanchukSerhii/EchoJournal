@@ -1,4 +1,4 @@
-package com.serhiiromanchuk.echojournal.presentation.screens.entry.components
+package com.serhiiromanchuk.echojournal.presentation.core.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -143,25 +143,12 @@ private fun CreateButton(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-//        Box(
-//            modifier = Modifier.width(18.dp),
-//            contentAlignment = Alignment.Center
-//        ) {
-//            Icon(
-//                imageVector = Icons.Default.Add,
-//                contentDescription = stringResource(R.string.create_topic, searchQuery),
-//                modifier = Modifier.fillMaxSize(),
-//                tint = MaterialTheme.colorScheme.primary
-//            )
-//        }
-
         Image(
             painter = painterResource(R.drawable.ic_add_primary),
             contentDescription = stringResource(R.string.create_topic, searchQuery),
             modifier = Modifier.width(16.dp),
             contentScale = ContentScale.FillWidth
         )
-
 
         Text(
             text = "Create ‘$searchQuery’",

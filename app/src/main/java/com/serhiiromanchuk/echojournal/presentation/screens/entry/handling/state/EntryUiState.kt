@@ -11,8 +11,8 @@ data class EntryUiState(
     val topicValue: String = "",
     val descriptionValue: String = "",
     val playerState: PlayerState = PlayerState(),
-    val currentTopics: List<Topic> = listOf(),
-    val foundTopics: List<Topic> = listOf(),
+    val currentTopics: List<Topic> = emptyList(),
+    val foundTopics: List<Topic> = emptyList(),
     val entrySheetState: EntrySheetState = EntrySheetState()
 ) : UiState {
     val isSaveButtonEnabled: Boolean

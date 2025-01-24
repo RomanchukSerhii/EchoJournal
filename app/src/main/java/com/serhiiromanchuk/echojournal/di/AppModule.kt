@@ -1,6 +1,7 @@
 package com.serhiiromanchuk.echojournal.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.room.Room
 import com.serhiiromanchuk.echojournal.data.AndroidAudioRecorder
 import com.serhiiromanchuk.echojournal.data.database.TopicDao
@@ -9,10 +10,12 @@ import com.serhiiromanchuk.echojournal.data.AndroidAudioPlayer
 import com.serhiiromanchuk.echojournal.data.database.EntryDao
 import com.serhiiromanchuk.echojournal.data.database.EntryDatabase
 import com.serhiiromanchuk.echojournal.data.repository.EntryRepositoryImpl
+import com.serhiiromanchuk.echojournal.data.repository.SettingsRepositoryImpl
 import com.serhiiromanchuk.echojournal.data.repository.TopicRepositoryImpl
 import com.serhiiromanchuk.echojournal.domain.audio.AudioPlayer
 import com.serhiiromanchuk.echojournal.domain.audio.AudioRecorder
 import com.serhiiromanchuk.echojournal.domain.repository.EntryRepository
+import com.serhiiromanchuk.echojournal.domain.repository.SettingsRepository
 import com.serhiiromanchuk.echojournal.domain.repository.TopicRepository
 import com.serhiiromanchuk.echojournal.utils.Constants
 import dagger.Module
@@ -82,5 +85,20 @@ object AppProvidesModule {
         @ApplicationContext context: Context
     ): AudioPlayer {
         return AndroidAudioPlayer(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSharedPreferences(
+        @ApplicationContext context: Context
+    ): SharedPreferences {
+        return context.getSharedPreferences(Constants.APP_PREFERENCES_NAME, Context.MODE_PRIVATE)
+    }
+
+    @Provides
+    fun provideSettingsRepository(
+        sharedPreferences: SharedPreferences
+    ): SettingsRepository {
+        return SettingsRepositoryImpl(sharedPreferences)
     }
 }

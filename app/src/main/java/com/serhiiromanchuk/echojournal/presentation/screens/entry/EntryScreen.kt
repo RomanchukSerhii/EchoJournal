@@ -38,8 +38,8 @@ import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.Ent
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.EntryBottomSheet
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.EntryTextField
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.MoodChooseButton
-import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.TopicDropdown
-import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.TopicTextField
+import com.serhiiromanchuk.echojournal.presentation.core.components.TopicDropdown
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.TopicTagsRow
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryActionEvent
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.state.EntryUiState
@@ -143,7 +143,7 @@ private fun EntryScreen(
                 modifier = Modifier.height(44.dp),
             )
 
-            TopicTextField(
+            TopicTagsRow(
                 value = uiState.topicValue,
                 onValueChange = { onEvent(EntryUiEvent.TopicValueChanged(it)) },
                 topics = uiState.currentTopics,

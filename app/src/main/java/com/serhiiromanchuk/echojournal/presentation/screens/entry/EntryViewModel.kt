@@ -5,11 +5,13 @@ import com.serhiiromanchuk.echojournal.domain.audio.AudioPlayer
 import com.serhiiromanchuk.echojournal.domain.entity.Entry
 import com.serhiiromanchuk.echojournal.domain.entity.Topic
 import com.serhiiromanchuk.echojournal.domain.repository.EntryRepository
+import com.serhiiromanchuk.echojournal.domain.repository.SettingsRepository
 import com.serhiiromanchuk.echojournal.domain.repository.TopicRepository
 import com.serhiiromanchuk.echojournal.presentation.core.base.BaseViewModel
 import com.serhiiromanchuk.echojournal.presentation.core.state.PlayerState
 import com.serhiiromanchuk.echojournal.presentation.core.utils.MoodUiModel
 import com.serhiiromanchuk.echojournal.presentation.core.utils.toMoodType
+import com.serhiiromanchuk.echojournal.presentation.core.utils.toMoodUiModel
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryActionEvent
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.BottomSheetClosed
@@ -27,6 +29,7 @@ import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.Entry
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.TopicValueChanged
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.state.EntrySheetState
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.state.EntryUiState
+import com.serhiiromanchuk.echojournal.utils.Constants
 import com.serhiiromanchuk.echojournal.utils.InstantFormatter
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -52,10 +55,14 @@ class EntryViewModel @AssistedInject constructor(
     @Assisted val entryId: Long,
     private val entryRepository: EntryRepository,
     private val topicRepository: TopicRepository,
-    private val audioPlayer: AudioPlayer
+    private val audioPlayer: AudioPlayer,
+    settingsRepository: SettingsRepository
 ) : EntryBaseViewModel() {
     override val initialState: EntryUiState
         get() = EntryUiState()
+
+    private val defaultMood = settingsRepository.getMood(Constants.KEY_MOOD_SETTINGS)
+    private val defaultTopicsId = settingsRepository.getTopics(Constants.KEY_TOPIC_SETTINGS)
 
     private val searchQuery = MutableStateFlow("")
     private val searchResults: StateFlow<List<Topic>> = searchQuery
@@ -77,7 +84,6 @@ class EntryViewModel @AssistedInject constructor(
 
     init {
         audioPlayer.initializeFile(audioFilePath)
-
         updateState {
             it.copy(
                 playerState = currentState.playerState.copy(
@@ -85,6 +91,17 @@ class EntryViewModel @AssistedInject constructor(
                     amplitudeLogFilePath = amplitudeLogFilePath
                 )
             )
+        }
+
+        // Set default settings
+        launch {
+            val defaultTopics = topicRepository.getTopicsByIdList(defaultTopicsId)
+            updateState {
+                it.copy(
+                    entrySheetState = currentState.entrySheetState.copy(activeMood = defaultMood.toMoodUiModel()),
+                    currentTopics = defaultTopics,
+                )
+            }
         }
 
         // Set a listener to handle actions when audio playback completes.

@@ -90,13 +90,15 @@ class HomeViewModel @Inject constructor(
 
                 if (moodFiltersChecked.isEmpty() && topicFiltersChecked.isEmpty()) {
                     updateState { it.copy(isFilterActive = false) }
-                    mapOf()
                 } else {
-                    updateState { it.copy(isFilterActive = true) }
-                    filterEntries(currentState.entries, moodFilters, topicFilters)
+                    val filteredEntries = filterEntries(currentState.entries, moodFilters, topicFilters)
+                    updateState {
+                        it.copy(
+                            filteredEntries = filteredEntries,
+                            isFilterActive = true
+                        )
+                    }
                 }
-            }.collect { filteredEntries ->
-                updateState { it.copy(filteredEntries = filteredEntries) }
             }
         }
     }

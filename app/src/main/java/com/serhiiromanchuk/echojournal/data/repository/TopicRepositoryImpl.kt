@@ -21,4 +21,8 @@ class TopicRepositoryImpl @Inject constructor(
     override suspend fun insertTopic(topic: Topic) = topicDao.insertTopic(topic.toTopicDb())
 
     override suspend fun deleteTopic(topic: Topic) = topicDao.deleteTopic(topic.toTopicDb())
+
+    override suspend fun getTopicsByIdList(topicIdList: List<Long>): List<Topic> {
+        return topicDao.getTopicsById(topicIdList).map { it.toTopic() }
+    }
 }

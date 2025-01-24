@@ -13,6 +13,9 @@ interface TopicDao {
     @Query("SELECT * FROM topics ORDER BY name ASC")
     fun getTopics(): Flow<List<TopicDb>>
 
+    @Query("SELECT * FROM topics WHERE id IN (:topicIds)")
+    suspend fun getTopicsById(topicIds: List<Long>): List<TopicDb>
+
     @Query("SELECT * FROM topics WHERE name LIKE '%' || :query || '%' ORDER BY name ASC")
     suspend fun searchTopics(query: String): List<TopicDb>
 

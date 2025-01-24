@@ -11,4 +11,6 @@ interface TopicRepository {
     suspend fun insertTopic(topic: Topic)
 
     suspend fun deleteTopic(topic: Topic)
+
+    suspend fun getTopicsByIdList(topicIdList: List<Long>): List<Topic>
 }
