@@ -1,7 +1,7 @@
 package com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state
 
 import com.serhiiromanchuk.echojournal.domain.entity.Entry
-import com.serhiiromanchuk.echojournal.presentation.core.base.common.UiState
+import com.serhiiromanchuk.echojournal.presentation.core.base.handling.UiState
 import com.serhiiromanchuk.echojournal.presentation.core.state.PlayerState
 import java.time.Instant
 

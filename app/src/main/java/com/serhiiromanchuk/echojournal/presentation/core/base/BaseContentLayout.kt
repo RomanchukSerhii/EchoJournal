@@ -26,9 +26,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
-import com.serhiiromanchuk.echojournal.presentation.core.base.common.ActionEvent
-import com.serhiiromanchuk.echojournal.presentation.core.base.common.UiEvent
-import com.serhiiromanchuk.echojournal.presentation.core.base.common.UiState
+import com.serhiiromanchuk.echojournal.presentation.core.base.handling.ActionEvent
+import com.serhiiromanchuk.echojournal.presentation.core.base.handling.UiEvent
+import com.serhiiromanchuk.echojournal.presentation.core.base.handling.UiState
 import kotlinx.coroutines.CoroutineScope
 
 @Composable

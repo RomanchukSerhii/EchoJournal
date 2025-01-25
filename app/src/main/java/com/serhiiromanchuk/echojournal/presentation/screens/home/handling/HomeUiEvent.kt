@@ -1,6 +1,6 @@
 package com.serhiiromanchuk.echojournal.presentation.screens.home.handling
 
-import com.serhiiromanchuk.echojournal.presentation.core.base.common.UiEvent
+import com.serhiiromanchuk.echojournal.presentation.core.base.handling.UiEvent
 
 sealed interface HomeUiEvent : UiEvent {
 
@@ -23,8 +23,6 @@ sealed interface HomeUiEvent : UiEvent {
     data object ResumeRecording : HomeUiEvent
 
     data class StopRecording(val saveFile: Boolean) : HomeUiEvent
-
-    data object CancelRecording : HomeUiEvent
 
     data class PermissionDialogOpened(val isOpen: Boolean) : HomeUiEvent
 }

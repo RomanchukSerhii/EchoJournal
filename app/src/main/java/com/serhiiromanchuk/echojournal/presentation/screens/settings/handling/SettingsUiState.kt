@@ -2,7 +2,7 @@ package com.serhiiromanchuk.echojournal.presentation.screens.settings.handling
 
 import androidx.compose.ui.unit.IntOffset
 import com.serhiiromanchuk.echojournal.domain.entity.Topic
-import com.serhiiromanchuk.echojournal.presentation.core.base.common.UiState
+import com.serhiiromanchuk.echojournal.presentation.core.base.handling.UiState
 import com.serhiiromanchuk.echojournal.presentation.core.utils.MoodUiModel
 
 data class SettingsUiState(

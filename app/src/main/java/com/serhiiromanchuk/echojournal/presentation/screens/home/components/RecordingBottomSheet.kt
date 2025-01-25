@@ -66,7 +66,7 @@ fun RecordingBottomSheet(
                 RecordButtons(
                     modifier = Modifier.padding(vertical = 42.dp, horizontal = 16.dp),
                     isRecording = homeSheetState.isRecording,
-                    onCancelClick = { onEvent(HomeUiEvent.CancelRecording) },
+                    onCancelClick = { onEvent(HomeUiEvent.StopRecording(saveFile = false)) },
                     onRecordClick = {
                         if (homeSheetState.isRecording) {
                             onEvent(HomeUiEvent.StopRecording(saveFile = true))
@@ -78,7 +78,7 @@ fun RecordingBottomSheet(
                         if (homeSheetState.isRecording) {
                             onEvent(HomeUiEvent.PauseRecording)
                         } else {
-                            onEvent(HomeUiEvent.StopRecording(saveFile = false))
+                            onEvent(HomeUiEvent.StopRecording(saveFile = true))
                         }
                     }
                 )

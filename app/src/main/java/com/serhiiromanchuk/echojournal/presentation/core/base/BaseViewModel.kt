@@ -2,9 +2,9 @@ package com.serhiiromanchuk.echojournal.presentation.core.base
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.serhiiromanchuk.echojournal.presentation.core.base.common.ActionEvent
-import com.serhiiromanchuk.echojournal.presentation.core.base.common.UiEvent
-import com.serhiiromanchuk.echojournal.presentation.core.base.common.UiState
+import com.serhiiromanchuk.echojournal.presentation.core.base.handling.ActionEvent
+import com.serhiiromanchuk.echojournal.presentation.core.base.handling.UiEvent
+import com.serhiiromanchuk.echojournal.presentation.core.base.handling.UiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -9,7 +9,6 @@ import com.serhiiromanchuk.echojournal.presentation.core.utils.toMoodType
 import com.serhiiromanchuk.echojournal.presentation.core.utils.toMoodUiModel
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeActionEvent
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent
-import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.CancelRecording
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.MoodFilterItemClicked
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.MoodsFilterClearClicked
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.MoodsFilterToggled
@@ -119,7 +118,6 @@ class HomeViewModel @Inject constructor(
             PauseRecording -> pauseRecording()
             ResumeRecording -> resumeRecording()
             is StopRecording -> stopRecording(event.saveFile)
-            CancelRecording -> TODO()
         }
     }
 
@@ -253,7 +251,10 @@ class HomeViewModel @Inject constructor(
 
     private fun toggleSheetState() {
         val updatedSheetState =
-            currentState.homeSheetState.copy(isVisible = !currentState.homeSheetState.isVisible)
+            currentState.homeSheetState.copy(
+                isVisible = !currentState.homeSheetState.isVisible,
+                isRecording = true
+            )
 
         updateHomeSheetState(updatedSheetState)
     }

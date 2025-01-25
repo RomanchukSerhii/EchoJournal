@@ -56,6 +56,7 @@ class AndroidAudioRecorder @Inject constructor(
         }
 
         isCurrentlyRecording = true
+        isCurrentlyPaused = false
         startLoggingAmplitude()
     }
 
