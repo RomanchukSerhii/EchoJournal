@@ -158,6 +158,7 @@ class EntryViewModel @AssistedInject constructor(
             PlayClicked -> playAudio()
             PauseClicked -> pauseAudio()
             ResumeClicked -> resumeAudio()
+
             is EntryUiEvent.SaveButtonClicked -> saveEntry(event.outputDir)
         }
     }

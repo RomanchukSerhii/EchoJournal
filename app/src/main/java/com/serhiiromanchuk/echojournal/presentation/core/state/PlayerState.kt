@@ -1,7 +1,9 @@
 package com.serhiiromanchuk.echojournal.presentation.core.state
 
+import androidx.compose.runtime.Stable
 import com.serhiiromanchuk.echojournal.utils.InstantFormatter
 
+@Stable
 data class PlayerState(
     val duration: Int = 0,
     val currentPosition: Int = 0,

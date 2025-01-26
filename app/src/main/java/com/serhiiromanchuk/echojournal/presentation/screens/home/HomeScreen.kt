@@ -49,8 +49,17 @@ fun HomeScreenRoot(
         },
         floatingActionButton = {
             HomeFAB(
-                onResult = { isGranted ->
-                    if (isGranted) viewModel.onEvent(HomeUiEvent.StartRecording)
+                onResult = { isGranted, isLongClicked ->
+                    if (isGranted) {
+                        if (isLongClicked) {
+                            viewModel.onEvent(HomeUiEvent.ActionButtonStartRecording)
+                        } else {
+                            viewModel.onEvent(HomeUiEvent.StartRecording)
+                        }
+                    }
+                },
+                onLongPressRelease = { saveFile ->
+                    viewModel.onEvent(HomeUiEvent.ActionButtonStopRecording(saveFile))
                 }
             )
         },
@@ -85,18 +94,6 @@ private fun HomeScreen(
     onEvent: (HomeUiEvent) -> Unit
 ) {
     var filterOffset by remember { mutableStateOf(IntOffset.Zero) }
-//    var isFilterActive by remember { mutableStateOf(false)
-//        derivedStateOf {
-//            uiState.filterState.moodFilterItems.isNotEmpty() || uiState.filterState.topicFilterItems.isNotEmpty()
-//        }
-//    }
-
-//    LaunchedEffect(uiState.filterState.moodFilterItems, uiState.filterState.topicFilterItems) {
-//        val isMoodFilterActive = uiState.filterState.moodFilterItems.isNotEmpty()
-//        val isTopicFilterActive = uiState.filterState.topicFilterItems.isNotEmpty()
-//
-//        isFilterActive = isMoodFilterActive || isTopicFilterActive
-//    }
     Column {
         EchoFilter(
             filterState = uiState.filterState,

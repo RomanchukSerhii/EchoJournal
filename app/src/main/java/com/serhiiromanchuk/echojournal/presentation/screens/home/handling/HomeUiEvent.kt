@@ -25,4 +25,8 @@ sealed interface HomeUiEvent : UiEvent {
     data class StopRecording(val saveFile: Boolean) : HomeUiEvent
 
     data class PermissionDialogOpened(val isOpen: Boolean) : HomeUiEvent
+
+    data object ActionButtonStartRecording : HomeUiEvent
+
+    data class ActionButtonStopRecording(val saveFile: Boolean = true) : HomeUiEvent
 }

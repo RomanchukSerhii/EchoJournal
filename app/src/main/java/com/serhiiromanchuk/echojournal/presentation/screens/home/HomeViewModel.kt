@@ -9,17 +9,7 @@ import com.serhiiromanchuk.echojournal.presentation.core.utils.toMoodType
 import com.serhiiromanchuk.echojournal.presentation.core.utils.toMoodUiModel
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeActionEvent
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent
-import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.MoodFilterItemClicked
-import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.MoodsFilterClearClicked
-import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.MoodsFilterToggled
-import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.PauseRecording
-import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.PermissionDialogOpened
-import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.ResumeRecording
-import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.StartRecording
-import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.StopRecording
-import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.TopicFilterItemClicked
-import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.TopicsFilterClearClicked
-import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.TopicsFilterToggled
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.*
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.FilterState
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.HomeSheetState
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.HomeUiState
@@ -90,7 +80,8 @@ class HomeViewModel @Inject constructor(
                 if (moodFiltersChecked.isEmpty() && topicFiltersChecked.isEmpty()) {
                     updateState { it.copy(isFilterActive = false) }
                 } else {
-                    val filteredEntries = filterEntries(currentState.entries, moodFilters, topicFilters)
+                    val filteredEntries =
+                        filterEntries(currentState.entries, moodFilters, topicFilters)
                     updateState {
                         it.copy(
                             filteredEntries = filteredEntries,
@@ -114,10 +105,20 @@ class HomeViewModel @Inject constructor(
 
             is PermissionDialogOpened -> updateState { it.copy(isPermissionDialogOpen = event.isOpen) }
 
-            StartRecording -> startRecording()
+            StartRecording -> {
+                toggleSheetState()
+                startRecording()
+            }
+
             PauseRecording -> pauseRecording()
             ResumeRecording -> resumeRecording()
-            is StopRecording -> stopRecording(event.saveFile)
+            is StopRecording -> {
+                toggleSheetState()
+                stopRecording(event.saveFile)
+            }
+
+            ActionButtonStartRecording -> startRecording()
+            is ActionButtonStopRecording -> stopRecording(event.saveFile)
         }
     }
 
@@ -211,7 +212,6 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun startRecording() {
-        toggleSheetState()
         audioRecorder.start()
         stopWatch.start()
         stopWatchJob = launch {
@@ -238,7 +238,6 @@ class HomeViewModel @Inject constructor(
         val audioFilePath = audioRecorder.stop(saveFile)
         stopWatch.reset()
         stopWatchJob?.cancel()
-        toggleSheetState()
         if (saveFile) {
             val amplitudeLogFilePath = audioRecorder.getAmplitudeLogFilePath()
             sendActionEvent(
