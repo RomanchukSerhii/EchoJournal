@@ -43,7 +43,7 @@ fun EchoFilter(
                 FilterChip(
                     defaultTitle = stringResource(R.string.all_moods),
                     filterItems = filterState.moodFilterItems,
-                    isSelected = filterState.isMoodsOpen,
+                    isFilterSelected = filterState.isMoodsOpen,
                     onClick = { onEvent(HomeUiEvent.MoodsFilterToggled) },
                     onClearClick = { onEvent(HomeUiEvent.MoodsFilterClearClicked) },
                     leadingIcon = {
@@ -72,7 +72,7 @@ fun EchoFilter(
                 FilterChip(
                     defaultTitle = stringResource(R.string.all_topics),
                     filterItems = filterState.topicFilterItems,
-                    isSelected = filterState.isTopicsOpen,
+                    isFilterSelected = filterState.isTopicsOpen,
                     onClick = { onEvent(HomeUiEvent.TopicsFilterToggled) },
                     onClearClick = { onEvent(HomeUiEvent.TopicsFilterClearClicked) },
                 )
@@ -85,7 +85,7 @@ fun EchoFilter(
 private fun FilterChip(
     defaultTitle: String,
     filterItems: List<FilterState.FilterItem>,
-    isSelected: Boolean,
+    isFilterSelected: Boolean,
     onClick: () -> Unit,
     onClearClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -96,11 +96,11 @@ private fun FilterChip(
         onClick = onClick,
         shape = RoundedCornerShape(50.dp),
         colors = AssistChipDefaults.assistChipColors(
-            containerColor = if (isSelected) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.background
+            containerColor = if (isFilterSelected) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.background
         ),
         border = BorderStroke(
             width = 1.dp,
-            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
+            color = if (isFilterSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
         ),
         label = {
             Text(
@@ -112,7 +112,8 @@ private fun FilterChip(
             )
         },
         trailingIcon = {
-            if (isSelected) {
+            val isSomeMoodSelected = filterItems.any { it.isChecked }
+            if (isFilterSelected && isSomeMoodSelected) {
                 // Clear icon
                 IconButton(
                     modifier = Modifier.size(18.dp),

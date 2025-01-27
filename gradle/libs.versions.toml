@@ -17,6 +17,7 @@ splashscreen = "1.0.1"
 coil = "3.0.4"
 icons-extended = "1.7.6"
 gson = "2.11.0"
+glanceAppwidget = "1.1.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -50,6 +51,9 @@ androidx-navigation-compose = { module = "androidx.navigation:navigation-compose
 androidx-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashscreen" }
 
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+
+androidx-glance-material3 = { group = "androidx.glance", name = "glance-material3", version.ref = "glanceAppwidget" }
+androidx-glance-appwidget = { group = "androidx.glance", name = "glance-appwidget", version.ref = "glanceAppwidget" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

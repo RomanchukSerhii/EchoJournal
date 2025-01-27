@@ -6,16 +6,20 @@ import androidx.navigation.compose.NavHost
 
 @Composable
 fun RootAppNavigation(
-    modifier: Modifier = Modifier,
-    navigationState: NavigationState
+    navigationState: NavigationState,
+    isDataLoaded: () -> Unit,
+    isLaunchedFromWidget: Boolean,
+    modifier: Modifier = Modifier
 ) {
     NavHost(
         navController = navigationState.navHostController,
         startDestination = Screen.Home.route
     ) {
         homeRoute(
-            modifier = modifier,
-            navigationState = navigationState
+            navigationState = navigationState,
+            isDataLoaded = isDataLoaded,
+            isLaunchedFromWidget = isLaunchedFromWidget,
+            modifier = modifier
         )
         entryRoute(
             modifier = modifier,

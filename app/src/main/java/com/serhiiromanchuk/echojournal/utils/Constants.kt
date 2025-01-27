@@ -12,4 +12,5 @@ object Constants {
     const val DEFAULT_FORMATTED_TIME = "00:00:00"
     const val KEY_MOOD_SETTINGS = "mood_settings"
     const val KEY_TOPIC_SETTINGS = "topic_settings"
+    const val KEY_WIDGET_INTENT = "from_widget"
 }

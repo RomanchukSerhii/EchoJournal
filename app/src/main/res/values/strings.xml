@@ -37,4 +37,5 @@
     <string name="all_moods">All Moods</string>
     <string name="all_topics">All Topics</string>
     <string name="add_default_topic">Add default topic</string>
+    <string name="widget_name">Echo widget</string>
 </resources>

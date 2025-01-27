@@ -7,4 +7,6 @@ sealed interface HomeActionEvent : ActionEvent {
         val audioFilePath: String,
         val amplitudeFilePath: String
     ) : HomeActionEvent
+
+    data object DataLoaded : HomeActionEvent
 }

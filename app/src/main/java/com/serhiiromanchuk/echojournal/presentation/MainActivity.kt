@@ -3,6 +3,7 @@ package com.serhiiromanchuk.echojournal.presentation
 import android.content.Context
 import android.os.Bundle
 import android.os.Environment
+import android.os.PersistableBundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -13,6 +14,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.serhiiromanchuk.echojournal.navigation.RootAppNavigation
 import com.serhiiromanchuk.echojournal.navigation.rememberNavigationState
 import com.serhiiromanchuk.echojournal.presentation.theme.EchoJournalTheme
+import com.serhiiromanchuk.echojournal.utils.Constants
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,25 +22,38 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    private var keepSplashOpened = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        savedInstanceState?.let { keepSplashOpened = it.getBoolean(KEY_SPLASH) }
+
+        val fromWidget = intent.getBooleanExtra(Constants.KEY_WIDGET_INTENT, false)
 
         CoroutineScope(Dispatchers.IO).launch {
             deleteTempFiles(this@MainActivity)
         }
 
-        installSplashScreen()
+        installSplashScreen().setKeepOnScreenCondition { keepSplashOpened }
         enableEdgeToEdge()
 
         setContent {
             EchoJournalTheme {
                 val navigationState = rememberNavigationState()
                 RootAppNavigation(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    navigationState = navigationState
+                    navigationState = navigationState,
+                    isDataLoaded = { keepSplashOpened = false},
+                    isLaunchedFromWidget = fromWidget,
+                    modifier = Modifier.padding(horizontal = 16.dp)
                 )
             }
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
+        super.onSaveInstanceState(outState, outPersistentState)
+        outState.putBoolean(KEY_SPLASH, keepSplashOpened)
     }
 
     private fun deleteTempFiles(context: Context) {
@@ -51,5 +66,9 @@ class MainActivity : ComponentActivity() {
                 file.delete()
             }
         } else throw IllegalStateException("Music directory does not exist or is not accessible.")
+    }
+
+    companion object {
+        private const val KEY_SPLASH = "KEY_SPLASH"
     }
 }

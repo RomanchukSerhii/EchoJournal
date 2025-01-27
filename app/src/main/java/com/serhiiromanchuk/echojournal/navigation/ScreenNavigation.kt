@@ -9,13 +9,17 @@ import com.serhiiromanchuk.echojournal.presentation.screens.settings.SettingsScr
 import com.serhiiromanchuk.echojournal.utils.Constants
 
 fun NavGraphBuilder.homeRoute(
-    modifier: Modifier = Modifier,
-    navigationState: NavigationState
+    navigationState: NavigationState,
+    isDataLoaded: () -> Unit,
+    isLaunchedFromWidget: Boolean,
+    modifier: Modifier = Modifier
 ) {
     composable(route = Screen.Home.route) {
         HomeScreenRoot(
-            modifier = modifier,
-            navigationState = navigationState
+            navigationState = navigationState,
+            isDataLoaded = isDataLoaded,
+            isLaunchedFromWidget = isLaunchedFromWidget,
+            modifier = modifier
         )
     }
 }

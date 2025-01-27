@@ -1,6 +1,7 @@
 package com.serhiiromanchuk.echojournal.presentation.screens.home
 
 import android.net.Uri
+import androidx.lifecycle.viewModelScope
 import com.serhiiromanchuk.echojournal.domain.audio.AudioRecorder
 import com.serhiiromanchuk.echojournal.domain.entity.MoodType
 import com.serhiiromanchuk.echojournal.domain.repository.EntryRepository
@@ -19,6 +20,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -41,6 +43,8 @@ class HomeViewModel @Inject constructor(
     private val topicFiltersChecked = MutableStateFlow(listOf<FilterState.FilterItem>())
 
     init {
+        var isFirstLoad = true
+
         launch {
             entryRepository.getEntries().collect { entries ->
                 val topics = mutableListOf<String>()
@@ -66,31 +70,35 @@ class HomeViewModel @Inject constructor(
                         filterState = currentState.filterState.copy(topicFilterItems = updatedTopicFilterItems)
                     )
                 }
-            }
-        }
 
-        launch {
-            combine(
-                moodFiltersChecked,
-                topicFiltersChecked
-            ) { moodFiltersChecked, topicFiltersChecked ->
-                val moodFilters = moodFiltersChecked.map { it.title.toMoodUiModel().toMoodType() }
-                val topicFilters = topicFiltersChecked.map { it.title }
-
-                if (moodFiltersChecked.isEmpty() && topicFiltersChecked.isEmpty()) {
-                    updateState { it.copy(isFilterActive = false) }
-                } else {
-                    val filteredEntries =
-                        filterEntries(currentState.entries, moodFilters, topicFilters)
-                    updateState {
-                        it.copy(
-                            filteredEntries = filteredEntries,
-                            isFilterActive = true
-                        )
-                    }
+                if (isFirstLoad) {
+                    sendActionEvent(HomeActionEvent.DataLoaded)
+                    isFirstLoad = false
                 }
             }
         }
+
+        combine(
+            moodFiltersChecked,
+            topicFiltersChecked
+        ) { moodFiltersChecked, topicFiltersChecked ->
+            val moodFilters = moodFiltersChecked.map { it.title.toMoodUiModel().toMoodType() }
+            val topicFilters = topicFiltersChecked.map { it.title }
+
+            if (moodFiltersChecked.isEmpty() && topicFiltersChecked.isEmpty()) {
+                updateState { it.copy(isFilterActive = false) }
+            } else {
+                val filteredEntries =
+                    filterEntries(currentState.entries, moodFilters, topicFilters)
+
+                updateState {
+                    it.copy(
+                        filteredEntries = filteredEntries,
+                        isFilterActive = true
+                    )
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 
     override fun onEvent(event: HomeUiEvent) {
@@ -146,7 +154,8 @@ class HomeViewModel @Inject constructor(
             if (it.title == title) it.copy(isChecked = !it.isChecked) else it
         }
 
-        moodFiltersChecked.value = updatedMoodItems.filter { it.isChecked }
+        val test = updatedMoodItems.filter { it.isChecked }
+        moodFiltersChecked.value = test
         updateMoodFilterItems(updatedMoodItems)
     }
 
@@ -276,7 +285,7 @@ class HomeViewModel @Inject constructor(
         return entries.mapValues { (_, entryList) ->
             entryList.filter { entryHolderState ->
                 val entry = entryHolderState.entry
-                entry.moodType in moodFilters && entry.topics.any { it in topicFilters }
+                entry.moodType in moodFilters || entry.topics.any { it in topicFilters }
             }
         }.filterValues { it.isNotEmpty() }
     }

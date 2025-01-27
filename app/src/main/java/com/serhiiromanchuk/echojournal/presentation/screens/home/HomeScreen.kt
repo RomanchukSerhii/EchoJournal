@@ -31,8 +31,10 @@ import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.
 
 @Composable
 fun HomeScreenRoot(
-    modifier: Modifier = Modifier,
-    navigationState: NavigationState
+    navigationState: NavigationState,
+    isDataLoaded: () -> Unit,
+    isLaunchedFromWidget: Boolean,
+    modifier: Modifier = Modifier
 ) {
     val viewModel: HomeViewModel = hiltViewModel()
 
@@ -70,9 +72,15 @@ fun HomeScreenRoot(
                         audioFilePath = actionEvent.audioFilePath,
                         amplitudeLogFilePath = actionEvent.amplitudeFilePath
                     )
+
+                HomeActionEvent.DataLoaded -> {
+                    isDataLoaded()
+                    if (isLaunchedFromWidget) viewModel.onEvent(HomeUiEvent.StartRecording)
+                }
             }
         }
     ) { uiState ->
+
         if (uiState.entries.isEmpty()) {
             EmptyHomeScreen(modifier = Modifier.padding(16.dp))
         } else {
