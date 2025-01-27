@@ -69,7 +69,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun HomeFAB(
     onResult: (isGranted: Boolean, isLongClicked: Boolean) -> Unit,
-    onLongPressRelease: (saveFile: Boolean) -> Unit,
+    onLongPressRelease: (isEntryCanceled: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     buttonSize: Dp = 64.dp,
     pulsatingCircleSize: Dp = 128.dp
@@ -113,7 +113,8 @@ fun HomeFAB(
                     onDragEnd = {
                         isLongPressed = false
                         dragOffsetX = 0f
-                        onLongPressRelease(!isEntryCanceled)
+                        onLongPressRelease(isEntryCanceled)
+                        isEntryCanceled = false
                     },
                     onDrag = { change, _ ->
                         dragOffsetX += change.positionChange().x
@@ -176,7 +177,7 @@ fun HomeFAB(
                 },
                 onLongPressRelease = {
                     isLongPressed = false
-                    onLongPressRelease(!isEntryCanceled)
+                    onLongPressRelease(isEntryCanceled)
                 },
                 buttonSize = buttonSize
             )

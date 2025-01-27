@@ -60,8 +60,8 @@ fun HomeScreenRoot(
                         }
                     }
                 },
-                onLongPressRelease = { saveFile ->
-                    viewModel.onEvent(HomeUiEvent.ActionButtonStopRecording(saveFile))
+                onLongPressRelease = { isEntryCanceled ->
+                    viewModel.onEvent(HomeUiEvent.ActionButtonStopRecording(saveFile = !isEntryCanceled))
                 }
             )
         },
