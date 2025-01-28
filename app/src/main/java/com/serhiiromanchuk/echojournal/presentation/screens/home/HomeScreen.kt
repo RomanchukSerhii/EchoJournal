@@ -81,7 +81,7 @@ fun HomeScreenRoot(
         }
     ) { uiState ->
 
-        if (uiState.entries.isEmpty()) {
+        if (uiState.entries.isEmpty()  && !uiState.isFilterActive) {
             EmptyHomeScreen(modifier = Modifier.padding(16.dp))
         } else {
             HomeScreen(
@@ -115,7 +115,7 @@ private fun HomeScreen(
                 }
         )
 
-        if (uiState.filteredEntries.isEmpty() && uiState.isFilterActive) {
+        if (uiState.entries.isEmpty() && uiState.isFilterActive) {
             EmptyHomeScreen(
                 title = "No Entries Found",
                 supportingText = "Try adjusting your filters to find what you're looking for"
@@ -123,7 +123,7 @@ private fun HomeScreen(
         }
 
         JournalEntries(
-            entryNotes = if (uiState.isFilterActive) uiState.filteredEntries else uiState.entries,
+            entryNotes = uiState.entries,
             onEvent = onEvent
         )
     }

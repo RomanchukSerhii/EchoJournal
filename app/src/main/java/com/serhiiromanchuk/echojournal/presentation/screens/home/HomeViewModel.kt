@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.viewModelScope
 import com.serhiiromanchuk.echojournal.domain.audio.AudioPlayer
 import com.serhiiromanchuk.echojournal.domain.audio.AudioRecorder
+import com.serhiiromanchuk.echojournal.domain.entity.Entry
 import com.serhiiromanchuk.echojournal.domain.entity.MoodType
 import com.serhiiromanchuk.echojournal.domain.repository.EntryRepository
 import com.serhiiromanchuk.echojournal.presentation.core.base.BaseViewModel
@@ -58,69 +59,16 @@ class HomeViewModel @Inject constructor(
     private val stopWatch = StopWatch()
     private var stopWatchJob: Job? = null
 
-    private val moodFiltersChecked = MutableStateFlow(listOf<FilterState.FilterItem>())
-    private val topicFiltersChecked = MutableStateFlow(listOf<FilterState.FilterItem>())
+    private val moodFiltersChecked = MutableStateFlow<List<FilterState.FilterItem>>(emptyList())
+    private val topicFiltersChecked = MutableStateFlow<List<FilterState.FilterItem>>(emptyList())
+    private val filteredEntries = MutableStateFlow<Map<Instant, List<EntryHolderState>>?>(emptyMap())
+    private var fetchedEntries: Map<Instant, List<EntryHolderState>> = emptyMap()
 
     private var playingEntryId = MutableStateFlow<Long?>(null)
 
     init {
-        var isFirstLoad = true
-
-        launch {
-            entryRepository.getEntries().collect { entries ->
-                val topics = mutableListOf<String>()
-
-                val sortedEntries = entries
-                    .groupBy { entry ->
-                        entry.topics.forEach { topic ->
-                            if (!topics.contains(topic)) topics.add(topic)
-                        }
-
-                        val localDate =
-                            entry.creationTimestamp.atZone(ZoneId.systemDefault()).toLocalDate()
-                        localDate.atStartOfDay(ZoneOffset.UTC).toInstant()
-                    }
-                    .mapValues { (_, entryList) ->
-                        entryList.map { EntryHolderState(it) }
-                    }
-
-                val updatedTopicFilterItems = addNewTopicFilterItems(topics)
-                updateState {
-                    it.copy(
-                        entries = sortedEntries,
-                        filterState = currentState.filterState.copy(topicFilterItems = updatedTopicFilterItems)
-                    )
-                }
-
-                if (isFirstLoad) {
-                    sendActionEvent(HomeActionEvent.DataLoaded)
-                    isFirstLoad = false
-                }
-            }
-        }
-
-        combine(
-            moodFiltersChecked,
-            topicFiltersChecked
-        ) { moodFiltersChecked, topicFiltersChecked ->
-            val moodFilters = moodFiltersChecked.map { it.title.toMoodUiModel().toMoodType() }
-            val topicFilters = topicFiltersChecked.map { it.title }
-
-            if (moodFiltersChecked.isEmpty() && topicFiltersChecked.isEmpty()) {
-                updateState { it.copy(isFilterActive = false) }
-            } else {
-                val filteredEntries =
-                    filterEntries(currentState.entries, moodFilters, topicFilters)
-
-                updateState {
-                    it.copy(
-                        filteredEntries = filteredEntries,
-                        isFilterActive = true
-                    )
-                }
-            }
-        }.launchIn(viewModelScope)
-
+        observeEntries()
+        observeFilters()
         setupAudioPlayerListeners()
         observeAudioPlayerCurrentPosition()
     }
@@ -158,6 +106,94 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    private fun observeEntries() {
+        var isFirstLoad = true
+
+        entryRepository.getEntries()
+            .combine(filteredEntries) { dataEntries, currentFilteredEntries ->
+                val topics = mutableSetOf<String>()
+
+                val sortedEntries = if (currentFilteredEntries != null && currentFilteredEntries.isEmpty()) {
+                    fetchedEntries = groupEntriesByDate(dataEntries, topics)
+                    fetchedEntries
+                } else currentFilteredEntries ?: emptyMap()
+
+                val updatedTopicFilterItems = addNewTopicFilterItems(topics.toList())
+                updateState {
+                    it.copy(
+                        entries = sortedEntries,
+                        filterState = currentState.filterState.copy(topicFilterItems = updatedTopicFilterItems)
+                    )
+                }
+
+                if (isFirstLoad) {
+                    sendActionEvent(HomeActionEvent.DataLoaded)
+                    isFirstLoad = false
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun observeFilters() {
+        combine(moodFiltersChecked, topicFiltersChecked) { moodFilters, topicFilters ->
+            val moodTypes = moodFilters.map { it.title.toMoodUiModel().toMoodType() }
+            val topicTitles = topicFilters.map { it.title }
+            val isFilterActive = moodFilters.isNotEmpty() || topicFilters.isNotEmpty()
+
+            filteredEntries.value = if (isFilterActive) {
+                getFilteredEntries(fetchedEntries, moodTypes, topicTitles)
+            } else emptyMap()
+
+            updateState { it.copy(isFilterActive = isFilterActive) }
+        }.launchIn(viewModelScope)
+    }
+
+    private fun setupAudioPlayerListeners() {
+        // Set a listener to handle actions when audio playback completes.
+        audioPlayer.setOnCompletionListener {
+            playingEntryId.value?.let { entryId ->
+                updatePlayerStateAction(entryId, PlayerState.Action.Initializing)
+                audioPlayer.stop()
+            }
+        }
+    }
+
+    private fun observeAudioPlayerCurrentPosition() {
+        // Subscribe to the current position of the entry
+        launch {
+            audioPlayer.currentPositionFlow.collect { positionMillis ->
+                val currentPositionText =
+                    InstantFormatter.formatMillisToTime(positionMillis.toLong())
+                playingEntryId.value?.let { entryId ->
+                    updatePlayerStateCurrentPosition(
+                        entryId = entryId,
+                        currentPosition = positionMillis,
+                        currentPositionText = currentPositionText
+                    )
+                }
+
+            }
+        }
+    }
+
+    private fun groupEntriesByDate(
+        entries: List<Entry>,
+        topics: MutableSet<String>
+    ): Map<Instant, List<EntryHolderState>> {
+        return entries.groupBy { entry ->
+            entry.topics.forEach { topic ->
+                if (!topics.contains(topic)) topics.add(topic)
+            }
+            entry.creationTimestamp
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate()
+                .atStartOfDay(ZoneOffset.UTC)
+                .toInstant()
+        }.mapValues { (_, entryList) ->
+            entryList.map { EntryHolderState(it) }
+        }
+    }
+
     private fun toggleMoodFilter() {
         val updatedFilterState = currentState.filterState.copy(
             isMoodsOpen = !currentState.filterState.isMoodsOpen,
@@ -171,12 +207,12 @@ class HomeViewModel @Inject constructor(
             if (it.title == title) it.copy(isChecked = !it.isChecked) else it
         }
 
-        val test = updatedMoodItems.filter { it.isChecked }
-        moodFiltersChecked.value = test
+        moodFiltersChecked.value = updatedMoodItems.filter { it.isChecked }
         updateMoodFilterItems(updatedMoodItems)
     }
 
     private fun clearMoodFilter() {
+        moodFiltersChecked.value = emptyList()
         val updatedMoodItems = currentState.filterState.moodFilterItems.map {
             if (it.isChecked) it.copy(isChecked = false) else it
         }
@@ -202,6 +238,7 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun clearTopicFilter() {
+        topicFiltersChecked.value = emptyList()
         val updatedTopicItems = currentState.filterState.topicFilterItems.map {
             if (it.isChecked) it.copy(isChecked = false) else it
         }
@@ -384,44 +421,16 @@ class HomeViewModel @Inject constructor(
         updateState { it.copy(homeSheetState = updatedSheetState) }
     }
 
-    private fun filterEntries(
+    private fun getFilteredEntries(
         entries: Map<Instant, List<EntryHolderState>>,
         moodFilters: List<MoodType>,
         topicFilters: List<String>
-    ): Map<Instant, List<EntryHolderState>> {
+    ): Map<Instant, List<EntryHolderState>>? {
         return entries.mapValues { (_, entryList) ->
             entryList.filter { entryHolderState ->
                 val entry = entryHolderState.entry
                 entry.moodType in moodFilters || entry.topics.any { it in topicFilters }
             }
-        }.filterValues { it.isNotEmpty() }
-    }
-
-    private fun setupAudioPlayerListeners() {
-        // Set a listener to handle actions when audio playback completes.
-        audioPlayer.setOnCompletionListener {
-            playingEntryId.value?.let { entryId ->
-                updatePlayerStateAction(entryId, PlayerState.Action.Initializing)
-                audioPlayer.stop()
-            }
-        }
-    }
-
-    private fun observeAudioPlayerCurrentPosition() {
-        // Subscribe to the current position of the entry
-        launch {
-            audioPlayer.currentPositionFlow.collect { positionMillis ->
-                val currentPositionText =
-                    InstantFormatter.formatMillisToTime(positionMillis.toLong())
-                playingEntryId.value?.let { entryId ->
-                    updatePlayerStateCurrentPosition(
-                        entryId = entryId,
-                        currentPosition = positionMillis,
-                        currentPositionText = currentPositionText
-                    )
-                }
-
-            }
-        }
+        }.filterValues { it.isNotEmpty() }.ifEmpty { null }
     }
 }
