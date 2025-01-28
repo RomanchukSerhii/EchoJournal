@@ -83,55 +83,11 @@ class EntryViewModel @AssistedInject constructor(
         )
 
     init {
-        audioPlayer.initializeFile(audioFilePath)
-        updateState {
-            it.copy(
-                playerState = currentState.playerState.copy(
-                    duration = audioPlayer.getDuration(),
-                    amplitudeLogFilePath = amplitudeLogFilePath
-                )
-            )
-        }
-
-        // Set default settings
-        launch {
-            val defaultTopics = topicRepository.getTopicsByIdList(defaultTopicsId)
-            updateState {
-                it.copy(
-                    entrySheetState = currentState.entrySheetState.copy(activeMood = defaultMood.toMoodUiModel()),
-                    currentTopics = defaultTopics,
-                )
-            }
-        }
-
-        // Subscribe to topic search results
-        launch {
-            searchResults.collect {
-                updateState { it.copy(foundTopics = searchResults.value) }
-            }
-        }
-
-        // Set a listener to handle actions when audio playback completes.
-        audioPlayer.setOnCompletionListener {
-            updatePlayerStateAction(PlayerState.Action.Initializing)
-            audioPlayer.stop()
-        }
-
-        // Subscribe to the current position of the entry
-        launch {
-            audioPlayer.currentPositionFlow.collect { positionMillis ->
-                val currentPositionText =
-                    InstantFormatter.formatMillisToTime(positionMillis.toLong())
-                updateState {
-                    it.copy(
-                        playerState = currentState.playerState.copy(
-                            currentPosition = positionMillis,
-                            currentPositionText = currentPositionText
-                        )
-                    )
-                }
-            }
-        }
+        initializeAudioPlayer()
+        setupDefaultSettings()
+        subscribeToTopicSearchResults()
+        setupAudioPlayerListeners()
+        observeAudioPlayerCurrentPosition()
     }
 
     override fun onEvent(event: EntryUiEvent) {
@@ -163,59 +119,15 @@ class EntryViewModel @AssistedInject constructor(
         }
     }
 
-    private fun saveEntry(outputDir: File) {
-        val newAudioFilePath = renameFile(outputDir, audioFilePath, "audio")
-        val newAmplitudeLogFilePath = renameFile(outputDir, amplitudeLogFilePath, "amplitude")
-        val topics = currentState.currentTopics.map { it.name }
-
-        val newEntry = Entry(
-            title = currentState.titleValue,
-            moodType = currentState.currentMood.toMoodType(),
-            audioFilePath = newAudioFilePath,
-            audioDuration = currentState.playerState.duration,
-            amplitudeLogFilePath = newAmplitudeLogFilePath,
-            description = currentState.descriptionValue,
-            topics = topics
+    private fun toggleSheetState(
+        state: EntrySheetState,
+        activeMood: MoodUiModel = MoodUiModel.Undefined
+    ): EntrySheetState {
+        return state.copy(
+            isOpen = !state.isOpen,
+            activeMood = activeMood
         )
-
-        launch {
-            entryRepository.upsertEntry(newEntry)
-            sendActionEvent(EntryActionEvent.NavigateBack)
-        }
     }
-
-    private fun playAudio() {
-        updatePlayerStateAction(PlayerState.Action.Playing)
-        audioPlayer.play()
-    }
-
-    private fun pauseAudio() {
-        updatePlayerStateAction(PlayerState.Action.Paused)
-        audioPlayer.pause()
-    }
-
-    private fun resumeAudio() {
-        updatePlayerStateAction(PlayerState.Action.Resumed)
-        audioPlayer.resume()
-    }
-
-    private fun addNewTopic() {
-        val newTopic = Topic(name = currentState.topicValue)
-        updateCurrentTopics(newTopic)
-        launch {
-            topicRepository.insertTopic(newTopic)
-        }
-    }
-
-    private fun updateCurrentTopics(newTopic: Topic) {
-        updateState {
-            it.copy(
-                currentTopics = currentState.currentTopics + newTopic,
-                topicValue = ""
-            )
-        }
-    }
-
 
     private fun setCurrentMood(mood: MoodUiModel) {
         updateState {
@@ -239,14 +151,115 @@ class EntryViewModel @AssistedInject constructor(
         searchQuery.value = topic
     }
 
-    private fun toggleSheetState(
-        state: EntrySheetState,
-        activeMood: MoodUiModel = MoodUiModel.Undefined
-    ): EntrySheetState {
-        return state.copy(
-            isOpen = !state.isOpen,
-            activeMood = activeMood
+    private fun updateCurrentTopics(newTopic: Topic) {
+        updateState {
+            it.copy(
+                currentTopics = currentState.currentTopics + newTopic,
+                topicValue = ""
+            )
+        }
+    }
+
+    private fun addNewTopic() {
+        val newTopic = Topic(name = currentState.topicValue)
+        updateCurrentTopics(newTopic)
+        launch {
+            topicRepository.insertTopic(newTopic)
+        }
+    }
+
+    private fun playAudio() {
+        updatePlayerStateAction(PlayerState.Action.Playing)
+        audioPlayer.play()
+    }
+
+    private fun pauseAudio() {
+        updatePlayerStateAction(PlayerState.Action.Paused)
+        audioPlayer.pause()
+    }
+
+    private fun resumeAudio() {
+        updatePlayerStateAction(PlayerState.Action.Resumed)
+        audioPlayer.resume()
+    }
+
+    private fun saveEntry(outputDir: File) {
+        val newAudioFilePath = renameFile(outputDir, audioFilePath, "audio")
+        val newAmplitudeLogFilePath = renameFile(outputDir, amplitudeLogFilePath, "amplitude")
+        val topics = currentState.currentTopics.map { it.name }
+
+        val newEntry = Entry(
+            title = currentState.titleValue,
+            moodType = currentState.currentMood.toMoodType(),
+            audioFilePath = newAudioFilePath,
+            audioDuration = currentState.playerState.duration,
+            amplitudeLogFilePath = newAmplitudeLogFilePath,
+            description = currentState.descriptionValue,
+            topics = topics
         )
+
+        launch {
+            entryRepository.upsertEntry(newEntry)
+            sendActionEvent(EntryActionEvent.NavigateBack)
+        }
+    }
+
+    private fun initializeAudioPlayer() {
+        audioPlayer.initializeFile(audioFilePath)
+        updateState {
+            it.copy(
+                playerState = currentState.playerState.copy(
+                    duration = audioPlayer.getDuration(),
+                    amplitudeLogFilePath = amplitudeLogFilePath
+                )
+            )
+        }
+    }
+
+    private fun setupDefaultSettings() {
+        launch {
+            val defaultTopics = topicRepository.getTopicsByIdList(defaultTopicsId)
+            updateState {
+                it.copy(
+                    entrySheetState = currentState.entrySheetState.copy(
+                        activeMood = defaultMood.toMoodUiModel()
+                    ),
+                    currentTopics = defaultTopics
+                )
+            }
+        }
+    }
+
+    private fun subscribeToTopicSearchResults() {
+        launch {
+            searchResults.collect {
+                updateState { it.copy(foundTopics = searchResults.value) }
+            }
+        }
+    }
+
+    private fun setupAudioPlayerListeners() {
+        audioPlayer.setOnCompletionListener {
+            updatePlayerStateAction(PlayerState.Action.Initializing)
+            audioPlayer.stop()
+        }
+    }
+
+    private fun observeAudioPlayerCurrentPosition() {
+        launch {
+            audioPlayer.currentPositionFlow.collect { positionMillis ->
+                val currentPositionText =
+                    InstantFormatter.formatMillisToTime(positionMillis.toLong())
+                updateState {
+                    it.copy(
+                        playerState = currentState.playerState.copy(
+                            currentPosition = positionMillis,
+                            currentPositionText = currentPositionText
+                        )
+                    )
+                }
+            }
+        }
     }
 
     private fun updatePlayerStateAction(action: PlayerState.Action) {
