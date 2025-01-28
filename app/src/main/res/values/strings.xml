@@ -38,4 +38,6 @@
     <string name="all_topics">All Topics</string>
     <string name="add_default_topic">Add default topic</string>
     <string name="widget_name">Echo widget</string>
+    <string name="no_entries_found">No Entries Found</string>
+    <string name="no_entries_found_supporting_text">Try adjusting your filters to find what you\'re looking for</string>
 </resources>

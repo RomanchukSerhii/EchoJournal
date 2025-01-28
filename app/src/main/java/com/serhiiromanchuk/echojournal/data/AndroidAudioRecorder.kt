@@ -3,7 +3,6 @@ package com.serhiiromanchuk.echojournal.data
 import android.content.Context
 import android.media.MediaRecorder
 import android.os.Build
-import android.os.Environment
 import com.serhiiromanchuk.echojournal.domain.audio.AudioRecorder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +19,7 @@ class AndroidAudioRecorder @Inject constructor(
 ) : AudioRecorder {
 
     private val scope = CoroutineScope(Dispatchers.IO)
-    private val outputDir = context.getExternalFilesDir(Environment.DIRECTORY_MUSIC)
+    private val outputDir = context.filesDir
 
     private var recorder: MediaRecorder? = null
     private var audioFile: File? = null

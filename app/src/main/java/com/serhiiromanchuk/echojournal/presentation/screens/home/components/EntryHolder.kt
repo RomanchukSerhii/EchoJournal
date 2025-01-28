@@ -64,19 +64,33 @@ fun EntryHolder(
 ) {
     val entry = entryState.entry
     val moodUiModel = entry.moodType.toUiModel()
+
     Row(
-        modifier = modifier.height(IntrinsicSize.Max)
+        modifier = modifier.height(IntrinsicSize.Min)
     ) {
-        // Mood icon
+
+        var holderHeight by remember { mutableIntStateOf(0) }
+        var isHolderCollapsed by remember { mutableStateOf(false) }
+
+        // Mood icon and timeline
         MoodTimeline(
             moodRes = moodUiModel.moodIcons.fill,
             entryPosition = entryPosition,
-            modifier = Modifier.fillMaxHeight()
+            modifier = Modifier.fillMaxHeight(),
+            isHolderCollapsed = isHolderCollapsed,
+            holderHeight = holderHeight
         )
 
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
+                .onSizeChanged { size ->
+                    val currentHeight = size.height
+                    if (currentHeight != holderHeight) {
+                        isHolderCollapsed = currentHeight < holderHeight
+                        holderHeight = currentHeight
+                    }
+                }
                 .padding(vertical = 8.dp),
             shape = RoundedCornerShape(10.dp),
             shadowElevation = 6.dp
@@ -192,6 +206,8 @@ private fun TopicChip(
 private fun MoodTimeline(
     @DrawableRes moodRes: Int,
     entryPosition: EntryListPosition,
+    isHolderCollapsed: Boolean,
+    holderHeight: Int,
     modifier: Modifier = Modifier,
     iconTopPadding: Dp = 16.dp,
     iconEndPadding: Dp = 12.dp
@@ -199,20 +215,13 @@ private fun MoodTimeline(
     var elementHeight by remember { mutableIntStateOf(0) }
     var moodSize by remember { mutableStateOf(IntSize.Zero) }
 
-    // Derived state for the middle vertical offset of the mood icon, calculated based on its size and top padding
     val middleMoodOffsetY by remember {
-        derivedStateOf {
-            iconTopPadding.value.toInt() + moodSize.height / 2
-        }
+        derivedStateOf { moodSize.height / 2 + iconTopPadding.value.toInt() }
     }
 
-    // Derived state for the horizontal offset (X position) of the divider, calculated from the mood icon width
-    val dividerOffsetX by remember {
-        derivedStateOf { moodSize.width / 2 }
-    }
+    val dividerOffsetX by remember { derivedStateOf { moodSize.width / 2 } }
 
-    // Derived state for the vertical offset (Y position) of the divider, adjusted based on the entry position
-    val dividerOffsetY by remember {
+    val dividerOffsetY by remember(entryPosition) {
         derivedStateOf {
             // For 'Last' or 'Middle' entries, the divider starts at the top; for 'First', it starts lower
             if (entryPosition == EntryListPosition.Last ||
@@ -222,23 +231,19 @@ private fun MoodTimeline(
     }
 
     // Derived state for the height of the vertical divider, calculated based on the entry position and element height
-    val dividerHeight by remember {
+    val dividerHeight by remember(holderHeight, entryPosition) {
         derivedStateOf {
             // The height is adjusted based on the entry's position in the list
             when (entryPosition) {
                 EntryListPosition.First -> elementHeight - middleMoodOffsetY
                 EntryListPosition.Last -> middleMoodOffsetY
-                EntryListPosition.Middle -> elementHeight
+                EntryListPosition.Middle -> if (isHolderCollapsed) holderHeight else elementHeight
                 EntryListPosition.Single -> 0
             }
         }
     }
 
-    Box(
-        modifier = modifier
-            .fillMaxHeight()
-            .onSizeChanged { elementHeight = it.height }
-    ) {
+    Box(modifier = modifier.onSizeChanged { elementHeight = it.height } ) {
         VerticalDivider(
             modifier = Modifier
                 .offset {

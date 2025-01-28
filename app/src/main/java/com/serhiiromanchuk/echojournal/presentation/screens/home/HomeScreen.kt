@@ -117,8 +117,8 @@ private fun HomeScreen(
 
         if (uiState.entries.isEmpty() && uiState.isFilterActive) {
             EmptyHomeScreen(
-                title = "No Entries Found",
-                supportingText = "Try adjusting your filters to find what you're looking for"
+                title = stringResource(R.string.no_entries_found),
+                supportingText = stringResource(R.string.no_entries_found_supporting_text)
             )
         }
 

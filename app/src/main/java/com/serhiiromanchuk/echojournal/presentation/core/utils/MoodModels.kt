@@ -117,7 +117,7 @@ sealed class MoodUiModel(
 
     companion object {
         val allMoods: List<MoodUiModel> = listOf(
-            Excited, Neutral, Peaceful, Sad, Stressed
+            Excited, Peaceful, Neutral, Sad, Stressed
         )
     }
 }

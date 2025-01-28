@@ -19,7 +19,7 @@ fun MoodUiModel.toMoodType(): MoodType {
         MoodUiModel.Neutral -> MoodType.Neutral
         MoodUiModel.Peaceful -> MoodType.Peaceful
         MoodUiModel.Sad -> MoodType.Sad
-        MoodUiModel.Stressed -> MoodType.Excited
-        MoodUiModel.Undefined -> MoodType.Excited
+        MoodUiModel.Stressed -> MoodType.Stressed
+        MoodUiModel.Undefined -> MoodType.Undefined
     }
 }

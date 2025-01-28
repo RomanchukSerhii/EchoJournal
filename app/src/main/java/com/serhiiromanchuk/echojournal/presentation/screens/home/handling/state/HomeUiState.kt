@@ -9,7 +9,6 @@ import java.time.Instant
 @Stable
 data class HomeUiState(
     val entries: Map<Instant, List<EntryHolderState>> = mapOf(),
-//    val filteredEntries: Map<Instant, List<EntryHolderState>> = mapOf(),
     val filterState: FilterState = FilterState(),
     val isFilterActive: Boolean = false,
     val homeSheetState: HomeSheetState = HomeSheetState(),

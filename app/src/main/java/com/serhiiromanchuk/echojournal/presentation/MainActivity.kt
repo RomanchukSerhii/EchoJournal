@@ -2,7 +2,6 @@ package com.serhiiromanchuk.echojournal.presentation
 
 import android.content.Context
 import android.os.Bundle
-import android.os.Environment
 import android.os.PersistableBundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -57,7 +56,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun deleteTempFiles(context: Context) {
-        val outputDir = context.getExternalFilesDir(Environment.DIRECTORY_MUSIC)
+        val outputDir = context.filesDir
         if (outputDir != null && outputDir.exists()) {
             val temFiles = outputDir.listFiles { file ->
                 file.name.startsWith("temp")

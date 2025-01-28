@@ -1,6 +1,5 @@
 package com.serhiiromanchuk.echojournal.presentation.screens.entry
 
-import android.os.Environment
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,13 +31,13 @@ import com.serhiiromanchuk.echojournal.navigation.NavigationState
 import com.serhiiromanchuk.echojournal.presentation.core.base.BaseContentLayout
 import com.serhiiromanchuk.echojournal.presentation.core.components.AppTopBar
 import com.serhiiromanchuk.echojournal.presentation.core.components.MoodPlayer
+import com.serhiiromanchuk.echojournal.presentation.core.components.TopicDropdown
 import com.serhiiromanchuk.echojournal.presentation.core.utils.toDp
 import com.serhiiromanchuk.echojournal.presentation.core.utils.toInt
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.EntryBottomButtons
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.EntryBottomSheet
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.EntryTextField
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.MoodChooseButton
-import com.serhiiromanchuk.echojournal.presentation.core.components.TopicDropdown
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.TopicTagsRow
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryActionEvent
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent
@@ -81,7 +80,7 @@ fun EntryScreenRoot(
                 primaryButtonText = stringResource(R.string.save),
                 onCancelClick = {},
                 onConfirmClick = {
-                    val outputDir = context.getExternalFilesDir(Environment.DIRECTORY_MUSIC)
+                    val outputDir = context.filesDir
                     viewModel.onEvent(EntryUiEvent.SaveButtonClicked(outputDir!!))
                 },
                 modifier = Modifier.padding(16.dp),
