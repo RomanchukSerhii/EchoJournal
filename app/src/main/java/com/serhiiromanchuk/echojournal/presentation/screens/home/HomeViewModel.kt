@@ -121,29 +121,8 @@ class HomeViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope)
 
-        // Set a listener to handle actions when audio playback completes.
-        audioPlayer.setOnCompletionListener {
-            playingEntryId.value?.let { entryId ->
-                updatePlayerStateAction(entryId, PlayerState.Action.Initializing)
-                audioPlayer.stop()
-            }
-        }
-
-        // Subscribe to the current position of the entry
-        launch {
-            audioPlayer.currentPositionFlow.collect { positionMillis ->
-                val currentPositionText =
-                    InstantFormatter.formatMillisToTime(positionMillis.toLong())
-                playingEntryId.value?.let { entryId ->
-                    updatePlayerStateCurrentPosition(
-                        entryId = entryId,
-                        currentPosition = positionMillis,
-                        currentPositionText = currentPositionText
-                    )
-                }
-
-            }
-        }
+        setupAudioPlayerListeners()
+        observeAudioPlayerCurrentPosition()
     }
 
     override fun onEvent(event: HomeUiEvent) {
@@ -179,40 +158,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun playEntry(entryId: Long) {
-        if (audioPlayer.isPlaying()) {
-            stopEntriesPlaying()
-            audioPlayer.stop()
-        }
-        playingEntryId.value = entryId
-        updatePlayerStateAction(entryId, PlayerState.Action.Playing)
-
-        val audioFilePath = getCurrentEntryHolderState(entryId).entry.audioFilePath
-        audioPlayer.initializeFile(audioFilePath)
-        audioPlayer.play()
-    }
-
-    private fun pauseEntry(entryId: Long) {
-        updatePlayerStateAction(entryId, PlayerState.Action.Paused)
-        audioPlayer.pause()
-    }
-
-    private fun resumeEntry(entryId: Long) {
-        updatePlayerStateAction(entryId, PlayerState.Action.Resumed)
-        audioPlayer.resume()
-    }
-
-    private fun addNewTopicFilterItems(topics: List<String>): List<FilterState.FilterItem> {
-        val currentTopics = currentState.filterState.topicFilterItems.map { it.title }
-        val newTopicItems = currentState.filterState.topicFilterItems.toMutableList()
-        topics.forEach { topic ->
-            if (!currentTopics.contains(topic)) {
-                newTopicItems.add(FilterState.FilterItem(topic))
-            }
-        }
-        return newTopicItems
-    }
-
     private fun toggleMoodFilter() {
         val updatedFilterState = currentState.filterState.copy(
             isMoodsOpen = !currentState.filterState.isMoodsOpen,
@@ -237,20 +182,6 @@ class HomeViewModel @Inject constructor(
         }
 
         updateMoodFilterItems(updatedMoodItems, false)
-    }
-
-    private fun updateMoodFilterItems(
-        updatedItems: List<FilterState.FilterItem>,
-        isOpen: Boolean = true
-    ) {
-        updateState {
-            it.copy(
-                filterState = currentState.filterState.copy(
-                    moodFilterItems = updatedItems,
-                    isMoodsOpen = isOpen
-                )
-            )
-        }
     }
 
     private fun toggleTopicFilter() {
@@ -278,18 +209,74 @@ class HomeViewModel @Inject constructor(
         updateTopicFilterItems(updatedTopicItems, false)
     }
 
-    private fun updateTopicFilterItems(
-        updatedItems: List<FilterState.FilterItem>,
-        isOpen: Boolean = true
-    ) {
-        updateState {
-            it.copy(
-                filterState = currentState.filterState.copy(
-                    topicFilterItems = updatedItems,
-                    isTopicsOpen = isOpen
+    private fun toggleSheetState() {
+        val updatedSheetState =
+            currentState.homeSheetState.copy(
+                isVisible = !currentState.homeSheetState.isVisible,
+                isRecording = true
+            )
+
+        updateHomeSheetState(updatedSheetState)
+    }
+
+    private fun startRecording() {
+        audioRecorder.start()
+        stopWatch.start()
+        stopWatchJob = launch {
+            stopWatch.formattedTime.collect {
+                val updatedSheetState = currentState.homeSheetState.copy(recordingTime = it)
+                updateHomeSheetState(updatedSheetState)
+            }
+        }
+    }
+
+    private fun pauseRecording() {
+        audioRecorder.pause()
+        stopWatch.pause()
+        toggleRecordingState()
+    }
+
+    private fun resumeRecording() {
+        audioRecorder.resume()
+        stopWatch.start()
+        toggleRecordingState()
+    }
+
+    private fun stopRecording(saveFile: Boolean) {
+        val audioFilePath = audioRecorder.stop(saveFile)
+        stopWatch.reset()
+        stopWatchJob?.cancel()
+        if (saveFile) {
+            val amplitudeLogFilePath = audioRecorder.getAmplitudeLogFilePath()
+            sendActionEvent(
+                HomeActionEvent.NavigateToEntryScreen(
+                    Uri.encode(audioFilePath), Uri.encode(amplitudeLogFilePath)
                 )
             )
         }
+    }
+
+    private fun playEntry(entryId: Long) {
+        if (audioPlayer.isPlaying()) {
+            stopEntriesPlaying()
+            audioPlayer.stop()
+        }
+        playingEntryId.value = entryId
+        updatePlayerStateAction(entryId, PlayerState.Action.Playing)
+
+        val audioFilePath = getCurrentEntryHolderState(entryId).entry.audioFilePath
+        audioPlayer.initializeFile(audioFilePath)
+        audioPlayer.play()
+    }
+
+    private fun pauseEntry(entryId: Long) {
+        updatePlayerStateAction(entryId, PlayerState.Action.Paused)
+        audioPlayer.pause()
+    }
+
+    private fun resumeEntry(entryId: Long) {
+        updatePlayerStateAction(entryId, PlayerState.Action.Resumed)
+        audioPlayer.resume()
     }
 
     private fun stopEntriesPlaying() {
@@ -341,58 +328,50 @@ class HomeViewModel @Inject constructor(
         updateState { it.copy(entries = updatedEntries) }
     }
 
-    private fun getCurrentEntryHolderState(entryId: Long): EntryHolderState {
-        return currentState.entries.values
-            .flatten()
-            .find { it.entry.id == entryId }
-            ?: throw IllegalArgumentException("Audio file path not found for entry ID: $entryId")
-    }
-
-    private fun startRecording() {
-        audioRecorder.start()
-        stopWatch.start()
-        stopWatchJob = launch {
-            stopWatch.formattedTime.collect {
-                val updatedSheetState = currentState.homeSheetState.copy(recordingTime = it)
-                updateHomeSheetState(updatedSheetState)
+    private fun addNewTopicFilterItems(topics: List<String>): List<FilterState.FilterItem> {
+        val currentTopics = currentState.filterState.topicFilterItems.map { it.title }
+        val newTopicItems = currentState.filterState.topicFilterItems.toMutableList()
+        topics.forEach { topic ->
+            if (!currentTopics.contains(topic)) {
+                newTopicItems.add(FilterState.FilterItem(topic))
             }
         }
+        return newTopicItems
     }
 
-    private fun pauseRecording() {
-        audioRecorder.pause()
-        stopWatch.pause()
-        toggleRecordingState()
-    }
-
-    private fun resumeRecording() {
-        audioRecorder.resume()
-        stopWatch.start()
-        toggleRecordingState()
-    }
-
-    private fun stopRecording(saveFile: Boolean) {
-        val audioFilePath = audioRecorder.stop(saveFile)
-        stopWatch.reset()
-        stopWatchJob?.cancel()
-        if (saveFile) {
-            val amplitudeLogFilePath = audioRecorder.getAmplitudeLogFilePath()
-            sendActionEvent(
-                HomeActionEvent.NavigateToEntryScreen(
-                    Uri.encode(audioFilePath), Uri.encode(amplitudeLogFilePath)
+    private fun updateTopicFilterItems(
+        updatedItems: List<FilterState.FilterItem>,
+        isOpen: Boolean = true
+    ) {
+        updateState {
+            it.copy(
+                filterState = currentState.filterState.copy(
+                    topicFilterItems = updatedItems,
+                    isTopicsOpen = isOpen
                 )
             )
         }
     }
 
-    private fun toggleSheetState() {
-        val updatedSheetState =
-            currentState.homeSheetState.copy(
-                isVisible = !currentState.homeSheetState.isVisible,
-                isRecording = true
+    private fun updateMoodFilterItems(
+        updatedItems: List<FilterState.FilterItem>,
+        isOpen: Boolean = true
+    ) {
+        updateState {
+            it.copy(
+                filterState = currentState.filterState.copy(
+                    moodFilterItems = updatedItems,
+                    isMoodsOpen = isOpen
+                )
             )
+        }
+    }
 
-        updateHomeSheetState(updatedSheetState)
+    private fun getCurrentEntryHolderState(entryId: Long): EntryHolderState {
+        return currentState.entries.values
+            .flatten()
+            .find { it.entry.id == entryId }
+            ?: throw IllegalArgumentException("Audio file path not found for entry ID: $entryId")
     }
 
     private fun toggleRecordingState() {
@@ -416,5 +395,33 @@ class HomeViewModel @Inject constructor(
                 entry.moodType in moodFilters || entry.topics.any { it in topicFilters }
             }
         }.filterValues { it.isNotEmpty() }
+    }
+
+    private fun setupAudioPlayerListeners() {
+        // Set a listener to handle actions when audio playback completes.
+        audioPlayer.setOnCompletionListener {
+            playingEntryId.value?.let { entryId ->
+                updatePlayerStateAction(entryId, PlayerState.Action.Initializing)
+                audioPlayer.stop()
+            }
+        }
+    }
+
+    private fun observeAudioPlayerCurrentPosition() {
+        // Subscribe to the current position of the entry
+        launch {
+            audioPlayer.currentPositionFlow.collect { positionMillis ->
+                val currentPositionText =
+                    InstantFormatter.formatMillisToTime(positionMillis.toLong())
+                playingEntryId.value?.let { entryId ->
+                    updatePlayerStateCurrentPosition(
+                        entryId = entryId,
+                        currentPosition = positionMillis,
+                        currentPositionText = currentPositionText
+                    )
+                }
+
+            }
+        }
     }
 }
