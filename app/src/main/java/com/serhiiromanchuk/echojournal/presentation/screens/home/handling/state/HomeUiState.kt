@@ -18,11 +18,10 @@ data class HomeUiState(
 
     @Stable
     data class EntryHolderState(
-        val entry: Entry
-    ) {
-        val playerState = PlayerState(
+        val entry: Entry,
+        val playerState: PlayerState = PlayerState(
             duration = entry.audioDuration,
             amplitudeLogFilePath = entry.amplitudeLogFilePath
         )
-    }
+    )
 }

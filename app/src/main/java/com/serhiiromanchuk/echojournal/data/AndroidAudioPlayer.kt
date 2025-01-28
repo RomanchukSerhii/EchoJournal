@@ -27,6 +27,8 @@ class AndroidAudioPlayer(
 
     private var updateJob: Job? = null
 
+    private var isCurrentlyPlaying: Boolean = false
+
     override fun initializeFile(filePath: String) {
         this.filePath = filePath
         createPlayer()
@@ -39,6 +41,7 @@ class AndroidAudioPlayer(
         player?.start()
         player?.metrics
         startUpdatingCurrentPosition()
+        isCurrentlyPlaying = true
     }
 
     override fun pause() {
@@ -61,6 +64,7 @@ class AndroidAudioPlayer(
         player?.stop()
         player?.release()
         player = null
+        isCurrentlyPlaying = false
 
     }
 
@@ -71,6 +75,10 @@ class AndroidAudioPlayer(
     override fun getDuration(): Int {
         checkPlayerReady()
         return player?.duration ?: 0
+    }
+
+    override fun isPlaying(): Boolean {
+        return player?.isPlaying == true || isCurrentlyPlaying
     }
 
     private fun createPlayer() {

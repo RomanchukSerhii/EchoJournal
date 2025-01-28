@@ -11,4 +11,5 @@ interface AudioPlayer {
     fun stop()
     fun setOnCompletionListener(listener: () -> Unit)
     fun getDuration(): Int
+    fun isPlaying(): Boolean
 }

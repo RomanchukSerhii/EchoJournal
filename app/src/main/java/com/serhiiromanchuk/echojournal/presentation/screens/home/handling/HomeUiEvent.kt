@@ -29,4 +29,10 @@ sealed interface HomeUiEvent : UiEvent {
     data object ActionButtonStartRecording : HomeUiEvent
 
     data class ActionButtonStopRecording(val saveFile: Boolean = true) : HomeUiEvent
+
+    data class EntryPlayClick(val entryId: Long) : HomeUiEvent
+
+    data class EntryPauseClick(val entryId: Long) : HomeUiEvent
+
+    data class EntryResumeClick(val entryId: Long) : HomeUiEvent
 }

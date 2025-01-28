@@ -96,9 +96,9 @@ fun EntryHolder(
                 MoodPlayer(
                     moodColor = moodUiModel.moodColor,
                     playerState = entryState.playerState,
-                    onPlayClick = {},
-                    onPauseClick = {},
-                    onResumeClick = {}
+                    onPlayClick = { onEvent(HomeUiEvent.EntryPlayClick(entry.id)) },
+                    onPauseClick = { onEvent(HomeUiEvent.EntryPauseClick(entry.id)) },
+                    onResumeClick = { onEvent(HomeUiEvent.EntryResumeClick(entry.id))}
                 )
 
                 // Entry description

@@ -104,17 +104,17 @@ class EntryViewModel @AssistedInject constructor(
             }
         }
 
-        // Set a listener to handle actions when audio playback completes.
-        audioPlayer.setOnCompletionListener {
-            updatePlayerStateAction(PlayerState.Action.Initializing)
-            audioPlayer.stop()
-        }
-
         // Subscribe to topic search results
         launch {
             searchResults.collect {
                 updateState { it.copy(foundTopics = searchResults.value) }
             }
+        }
+
+        // Set a listener to handle actions when audio playback completes.
+        audioPlayer.setOnCompletionListener {
+            updatePlayerStateAction(PlayerState.Action.Initializing)
+            audioPlayer.stop()
         }
 
         // Subscribe to the current position of the entry

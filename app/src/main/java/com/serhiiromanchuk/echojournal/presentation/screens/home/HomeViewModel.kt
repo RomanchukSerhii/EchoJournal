@@ -2,19 +2,37 @@ package com.serhiiromanchuk.echojournal.presentation.screens.home
 
 import android.net.Uri
 import androidx.lifecycle.viewModelScope
+import com.serhiiromanchuk.echojournal.domain.audio.AudioPlayer
 import com.serhiiromanchuk.echojournal.domain.audio.AudioRecorder
 import com.serhiiromanchuk.echojournal.domain.entity.MoodType
 import com.serhiiromanchuk.echojournal.domain.repository.EntryRepository
 import com.serhiiromanchuk.echojournal.presentation.core.base.BaseViewModel
+import com.serhiiromanchuk.echojournal.presentation.core.state.PlayerState
 import com.serhiiromanchuk.echojournal.presentation.core.utils.toMoodType
 import com.serhiiromanchuk.echojournal.presentation.core.utils.toMoodUiModel
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeActionEvent
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent
-import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.*
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.ActionButtonStartRecording
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.ActionButtonStopRecording
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.EntryPauseClick
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.EntryPlayClick
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.EntryResumeClick
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.MoodFilterItemClicked
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.MoodsFilterClearClicked
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.MoodsFilterToggled
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.PauseRecording
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.PermissionDialogOpened
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.ResumeRecording
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.StartRecording
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.StopRecording
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.TopicFilterItemClicked
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.TopicsFilterClearClicked
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.TopicsFilterToggled
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.FilterState
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.HomeSheetState
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.HomeUiState
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.HomeUiState.EntryHolderState
+import com.serhiiromanchuk.echojournal.utils.InstantFormatter
 import com.serhiiromanchuk.echojournal.utils.StopWatch
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -31,7 +49,8 @@ private typealias HomeBaseViewModel = BaseViewModel<HomeUiState, HomeUiEvent, Ho
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val entryRepository: EntryRepository,
-    private val audioRecorder: AudioRecorder
+    private val audioRecorder: AudioRecorder,
+    private val audioPlayer: AudioPlayer,
 ) : HomeBaseViewModel() {
     override val initialState: HomeUiState
         get() = HomeUiState()
@@ -41,6 +60,8 @@ class HomeViewModel @Inject constructor(
 
     private val moodFiltersChecked = MutableStateFlow(listOf<FilterState.FilterItem>())
     private val topicFiltersChecked = MutableStateFlow(listOf<FilterState.FilterItem>())
+
+    private var playingEntryId = MutableStateFlow<Long?>(null)
 
     init {
         var isFirstLoad = true
@@ -99,6 +120,30 @@ class HomeViewModel @Inject constructor(
                 }
             }
         }.launchIn(viewModelScope)
+
+        // Set a listener to handle actions when audio playback completes.
+        audioPlayer.setOnCompletionListener {
+            playingEntryId.value?.let { entryId ->
+                updatePlayerStateAction(entryId, PlayerState.Action.Initializing)
+                audioPlayer.stop()
+            }
+        }
+
+        // Subscribe to the current position of the entry
+        launch {
+            audioPlayer.currentPositionFlow.collect { positionMillis ->
+                val currentPositionText =
+                    InstantFormatter.formatMillisToTime(positionMillis.toLong())
+                playingEntryId.value?.let { entryId ->
+                    updatePlayerStateCurrentPosition(
+                        entryId = entryId,
+                        currentPosition = positionMillis,
+                        currentPositionText = currentPositionText
+                    )
+                }
+
+            }
+        }
     }
 
     override fun onEvent(event: HomeUiEvent) {
@@ -127,7 +172,34 @@ class HomeViewModel @Inject constructor(
 
             ActionButtonStartRecording -> startRecording()
             is ActionButtonStopRecording -> stopRecording(event.saveFile)
+
+            is EntryPlayClick -> playEntry(event.entryId)
+            is EntryPauseClick -> pauseEntry(event.entryId)
+            is EntryResumeClick -> resumeEntry(event.entryId)
         }
+    }
+
+    private fun playEntry(entryId: Long) {
+        if (audioPlayer.isPlaying()) {
+            stopEntriesPlaying()
+            audioPlayer.stop()
+        }
+        playingEntryId.value = entryId
+        updatePlayerStateAction(entryId, PlayerState.Action.Playing)
+
+        val audioFilePath = getCurrentEntryHolderState(entryId).entry.audioFilePath
+        audioPlayer.initializeFile(audioFilePath)
+        audioPlayer.play()
+    }
+
+    private fun pauseEntry(entryId: Long) {
+        updatePlayerStateAction(entryId, PlayerState.Action.Paused)
+        audioPlayer.pause()
+    }
+
+    private fun resumeEntry(entryId: Long) {
+        updatePlayerStateAction(entryId, PlayerState.Action.Resumed)
+        audioPlayer.resume()
     }
 
     private fun addNewTopicFilterItems(topics: List<String>): List<FilterState.FilterItem> {
@@ -218,6 +290,62 @@ class HomeViewModel @Inject constructor(
                 )
             )
         }
+    }
+
+    private fun stopEntriesPlaying() {
+        val updatedEntries = currentState.entries.mapValues { (_, entryList) ->
+            entryList.map { entryHolderState ->
+                if (entryHolderState.playerState.action == PlayerState.Action.Playing
+                    || entryHolderState.playerState.action == PlayerState.Action.Paused
+                ) {
+                    val updatedPlayerState =
+                        entryHolderState.playerState.copy(
+                            action = PlayerState.Action.Initializing,
+                            currentPosition = 0,
+                            currentPositionText = "00:00"
+                        )
+                    entryHolderState.copy(playerState = updatedPlayerState)
+                } else entryHolderState
+            }
+        }
+        updateState { it.copy(entries = updatedEntries) }
+    }
+
+    private fun updatePlayerStateCurrentPosition(
+        entryId: Long,
+        currentPosition: Int,
+        currentPositionText: String
+    ) {
+        val entryHolderState = getCurrentEntryHolderState(entryId)
+        val updatedPlayerState = entryHolderState.playerState.copy(
+            currentPosition = currentPosition,
+            currentPositionText = currentPositionText
+        )
+        updatePlayerState(entryId, updatedPlayerState)
+    }
+
+    private fun updatePlayerStateAction(entryId: Long, action: PlayerState.Action) {
+        val entryHolderState = getCurrentEntryHolderState(entryId)
+        val updatedPlayerState = entryHolderState.playerState.copy(action = action)
+        updatePlayerState(entryId, updatedPlayerState)
+    }
+
+    private fun updatePlayerState(entryId: Long, newPlayerState: PlayerState) {
+        val updatedEntries = currentState.entries.mapValues { (_, entryList) ->
+            entryList.map { entryHolderState ->
+                if (entryHolderState.entry.id == entryId) {
+                    entryHolderState.copy(playerState = newPlayerState)
+                } else entryHolderState
+            }
+        }
+        updateState { it.copy(entries = updatedEntries) }
+    }
+
+    private fun getCurrentEntryHolderState(entryId: Long): EntryHolderState {
+        return currentState.entries.values
+            .flatten()
+            .find { it.entry.id == entryId }
+            ?: throw IllegalArgumentException("Audio file path not found for entry ID: $entryId")
     }
 
     private fun startRecording() {
