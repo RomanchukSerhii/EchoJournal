@@ -128,9 +128,9 @@ fun EntryHolder(
                     )
                 }
 
-                // Topic Chips
+                // Topic tags
                 if (entry.topics.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(6.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     FlowRow(
                         modifier = Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(6.dp),

@@ -23,7 +23,8 @@ private val LightColorScheme = lightColorScheme(
     errorContainer = EchoSoftPeach,
     onErrorContainer = EchoRed,
     onPrimaryContainer = EchoPaleBlue,
-    surfaceTint = EchoDeepBlue
+    surfaceTint = EchoDeepBlue,
+    secondaryContainer = EchoDustyBlue
 )
 
 @Composable
