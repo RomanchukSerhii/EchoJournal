@@ -1,10 +1,7 @@
-@file:OptIn(ExperimentalLayoutApi::class)
-
 package com.serhiiromanchuk.echojournal.presentation.screens.entry.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
@@ -32,6 +29,7 @@ fun EntryTextField(
     modifier: Modifier = Modifier,
     leadingIcon: (@Composable () -> Unit)? = null,
     hintText: String = "",
+    singleLine: Boolean = true,
     textStyle: TextStyle = MaterialTheme.typography.bodyMedium.copy(
         color = MaterialTheme.colorScheme.onSurface
     ),
@@ -44,14 +42,14 @@ fun EntryTextField(
         onValueChange = onValueChange,
         modifier = modifier.onFocusChanged { isFocused = it.isFocused },
         textStyle = textStyle,
-        singleLine = true,
+        singleLine = singleLine,
         keyboardOptions = KeyboardOptions.Default.copy(
             capitalization = KeyboardCapitalization.Sentences
         ),
         decorationBox = { innerTextField ->
             Row (
                 modifier = Modifier,
-                verticalAlignment = Alignment.CenterVertically,
+                verticalAlignment = if (singleLine) Alignment.CenterVertically else Alignment.Top,
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 // Leading icon

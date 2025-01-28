@@ -172,7 +172,8 @@ private fun EntryScreen(
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.outlineVariant
                     )
-                }
+                },
+                singleLine = false
             )
         }
 
