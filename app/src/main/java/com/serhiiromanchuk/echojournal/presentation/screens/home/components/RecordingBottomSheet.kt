@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -34,6 +35,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.serhiiromanchuk.echojournal.R
 import com.serhiiromanchuk.echojournal.presentation.core.utils.GradientScheme
@@ -132,17 +134,19 @@ private fun RecordButtons(
     onCancelClick: () -> Unit,
     onRecordClick: () -> Unit,
     onPauseClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    recordButtonSize: Dp = 72.dp,
+    auxiliaryButtonSize: Dp = 48.dp
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().height(recordButtonSize),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceAround
     ) {
 
         // Cancel button
         IconButton(
-            modifier = Modifier.size(48.dp),
+            modifier = Modifier.size(auxiliaryButtonSize),
             onClick = onCancelClick,
             colors = IconButtonDefaults.iconButtonColors(
                 containerColor = MaterialTheme.colorScheme.errorContainer,
@@ -157,26 +161,36 @@ private fun RecordButtons(
 
         // Record button
         Box(
-            modifier = Modifier
-                .size(72.dp)
-                .clip(CircleShape)
-                .background(brush = GradientScheme.PrimaryGradient, shape = CircleShape)
-                .clickable { onRecordClick() },
+            modifier = Modifier.size(recordButtonSize),
             contentAlignment = Alignment.Center
         ) {
-            Image(
-                painter = if (isRecording) {
-                    painterResource(R.drawable.ic_checkmark)
-                } else {
-                    painterResource(R.drawable.ic_recording)
-                },
-                contentDescription = stringResource(R.string.recording_button)
-            )
+            Box(
+                modifier = Modifier
+                    .size(recordButtonSize)
+                    .clip(CircleShape)
+                    .background(brush = GradientScheme.PrimaryGradient, shape = CircleShape)
+                    .clickable { onRecordClick() },
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = if (isRecording) {
+                        painterResource(R.drawable.ic_checkmark)
+                    } else {
+                        painterResource(R.drawable.ic_recording)
+                    },
+                    contentDescription = stringResource(R.string.recording_button)
+                )
+            }
+
+            if (isRecording) {
+                ButtonPulsatingCircle()
+            }
         }
+
 
         // Pause button
         IconButton(
-            modifier = Modifier.size(48.dp),
+            modifier = Modifier.size(auxiliaryButtonSize),
             onClick = onPauseClick,
             colors = IconButtonDefaults.iconButtonColors(
                 containerColor = MaterialTheme.colorScheme.onPrimaryContainer,

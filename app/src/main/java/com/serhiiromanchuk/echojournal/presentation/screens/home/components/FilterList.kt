@@ -77,7 +77,7 @@ fun FilterList(
 }
 
 @Composable
-fun FilterItem(
+private fun FilterItem(
     filterItem: FilterItem,
     onClick: (String) -> Unit,
     modifier: Modifier = Modifier

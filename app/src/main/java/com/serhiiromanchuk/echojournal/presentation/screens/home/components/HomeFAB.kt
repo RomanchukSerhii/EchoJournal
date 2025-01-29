@@ -7,14 +7,8 @@ import android.net.Uri
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -44,7 +38,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
@@ -183,7 +176,7 @@ fun HomeFAB(
             )
 
             if (isLongPressed) {
-                PulsatingCircle(
+                ButtonPulsatingCircle(
                     baseSize = (pulsatingCircleSize.value - 20.dp.value).dp,
                     pulseSize = pulsatingCircleSize
                 )
@@ -211,7 +204,7 @@ fun HomeFAB(
 }
 
 @Composable
-fun RecordButton(
+private fun RecordButton(
     isRecording: Boolean,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
@@ -270,48 +263,6 @@ fun RecordButton(
                 tint = MaterialTheme.colorScheme.onPrimary
             )
         }
-    }
-}
-
-@Composable
-fun PulsatingCircle(
-    baseSize: Dp,
-    pulseSize: Dp,
-    modifier: Modifier = Modifier
-) {
-    val infiniteTransition = rememberInfiniteTransition(label = "Pulsating Circle Transition")
-    val density = LocalDensity.current
-
-    val baseSizePx = with(density) { baseSize.toPx() }
-    val pulseSizePx = with(density) { pulseSize.toPx() }
-
-    val animatedSize by infiniteTransition.animateFloat(
-        initialValue = baseSizePx,
-        targetValue = pulseSizePx,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1000, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "Pulsating circle size"
-    )
-
-    Canvas(
-        modifier = modifier
-            .size(pulseSize)
-    ) {
-        // Circle with animation
-        drawCircle(
-            brush = GradientScheme.FABPulsatingBackground,
-            radius = animatedSize / 2,
-            center = Offset(size.width / 2, size.height / 2)
-        )
-
-        // Circle without animation
-        drawCircle(
-            brush = GradientScheme.FABRecordingBackground,
-            radius = baseSize.toPx() / 2,
-            center = Offset(size.width / 2, size.height / 2)
-        )
     }
 }
 
