@@ -37,6 +37,7 @@ import com.serhiiromanchuk.echojournal.presentation.core.utils.toInt
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.EntryBottomButtons
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.EntryBottomSheet
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.EntryTextField
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.LeaveDialog
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.MoodChooseButton
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.TopicTagsRow
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryActionEvent
@@ -59,7 +60,7 @@ fun EntryScreenRoot(
     BaseContentLayout(
         modifier = modifier,
         viewModel = viewModel,
-        actionsEventHandler = { context, actionEvent ->
+        actionsEventHandler = { _, actionEvent ->
             when (actionEvent) {
                 EntryActionEvent.NavigateBack -> navigationState.popBackStack()
             }
@@ -71,14 +72,14 @@ fun EntryScreenRoot(
                 } else {
                     stringResource(R.string.edit_entry)
                 },
-                onBackClick = { navigationState.popBackStack() }
+                onBackClick = { viewModel.onEvent(EntryUiEvent.LeaveDialogToggled) }
             )
         },
         bottomBar = { uiState ->
             val context = LocalContext.current
             EntryBottomButtons(
                 primaryButtonText = stringResource(R.string.save),
-                onCancelClick = {},
+                onCancelClick = { viewModel.onEvent(EntryUiEvent.LeaveDialogToggled) },
                 onConfirmClick = {
                     val outputDir = context.filesDir
                     viewModel.onEvent(EntryUiEvent.SaveButtonClicked(outputDir!!))
@@ -87,6 +88,7 @@ fun EntryScreenRoot(
                 primaryButtonEnabled = uiState.isSaveButtonEnabled
             )
         },
+        onBackPressed = { viewModel.onEvent(EntryUiEvent.LeaveDialogToggled) },
         containerColor = MaterialTheme.colorScheme.surface
     ) { uiState ->
         EntryScreen(
@@ -97,6 +99,16 @@ fun EntryScreenRoot(
             entrySheetState = uiState.entrySheetState,
             onEvent = viewModel::onEvent
         )
+        if (uiState.showLeaveDialog) {
+            LeaveDialog(
+                headline = stringResource(R.string.cancel_recording),
+                onConfirm = { viewModel.onEvent(EntryUiEvent.LeaveDialogConfirmClicked) },
+                onDismissRequest = { viewModel.onEvent(EntryUiEvent.LeaveDialogToggled) },
+                supportingText = stringResource(R.string.leave_dialog_supporting_text),
+                cancelButtonName = stringResource(R.string.cancel),
+                confirmButtonName = stringResource(R.string.leave)
+            )
+        }
     }
 }
 
@@ -186,11 +198,3 @@ private fun EntryScreen(
         )
     }
 }
-
-//private fun renameFile(file: File, newValue: String): File {
-//    val newFileName = file.name.replace("temp", newValue)
-//    val newFile = File(outputDir, newFileName)
-//    val isRenamed = file.renameTo(newFile)
-//
-//    return if (isRenamed) newFile else throw IllegalStateException("Failed to rename audio file.")
-//}

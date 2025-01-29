@@ -20,4 +20,6 @@ sealed interface EntryUiEvent : UiEvent {
     data object PauseClicked : EntryUiEvent
     data object ResumeClicked : EntryUiEvent
     data class SaveButtonClicked(val outputDir: File) : EntryUiEvent
+    data object LeaveDialogToggled : EntryUiEvent
+    data object LeaveDialogConfirmClicked : EntryUiEvent
 }

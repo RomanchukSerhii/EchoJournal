@@ -14,19 +14,7 @@ import com.serhiiromanchuk.echojournal.presentation.core.utils.toMoodType
 import com.serhiiromanchuk.echojournal.presentation.core.utils.toMoodUiModel
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryActionEvent
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent
-import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.BottomSheetClosed
-import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.BottomSheetOpened
-import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.CreateTopicClicked
-import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.DescriptionValueChanged
-import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.MoodSelected
-import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.PauseClicked
-import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.PlayClicked
-import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.ResumeClicked
-import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.SheetConfirmedClicked
-import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.TagClearClicked
-import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.TitleValueChanged
-import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.TopicClicked
-import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.TopicValueChanged
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.*
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.state.EntrySheetState
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.state.EntryUiState
 import com.serhiiromanchuk.echojournal.utils.Constants
@@ -115,7 +103,10 @@ class EntryViewModel @AssistedInject constructor(
             PauseClicked -> pauseAudio()
             ResumeClicked -> resumeAudio()
 
-            is EntryUiEvent.SaveButtonClicked -> saveEntry(event.outputDir)
+            is SaveButtonClicked -> saveEntry(event.outputDir)
+
+            LeaveDialogToggled -> toggleLeaveDialog()
+            LeaveDialogConfirmClicked -> sendActionEvent(EntryActionEvent.NavigateBack)
         }
     }
 
@@ -202,6 +193,10 @@ class EntryViewModel @AssistedInject constructor(
             entryRepository.upsertEntry(newEntry)
             sendActionEvent(EntryActionEvent.NavigateBack)
         }
+    }
+
+    private fun toggleLeaveDialog() {
+        updateState { it.copy(showLeaveDialog = !currentState.showLeaveDialog) }
     }
 
     private fun initializeAudioPlayer() {

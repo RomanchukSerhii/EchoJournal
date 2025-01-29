@@ -9,7 +9,7 @@
     <string name="play_button">Play button</string>
     <string name="recording_paused">Recording paused</string>
     <string name="recording_your_memories">Recording your memories…</string>
-    <string name="cancel_recording">Cancel recording</string>
+    <string name="cancel_recording">Cancel recording?</string>
     <string name="recording_button">Recording button</string>
     <string name="pause_button">Pause button</string>
     <string name="cancel">Cancel</string>
@@ -40,4 +40,6 @@
     <string name="widget_name">Echo widget</string>
     <string name="no_entries_found">No Entries Found</string>
     <string name="no_entries_found_supporting_text">Try adjusting your filters to find what you\'re looking for</string>
+    <string name="leave">Leave</string>
+    <string name="leave_dialog_supporting_text">Are you sure you want to cancel this voice memo? This action cannot be undone.</string>
 </resources>

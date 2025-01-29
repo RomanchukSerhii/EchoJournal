@@ -285,6 +285,7 @@ class HomeViewModel @Inject constructor(
         stopWatchJob?.cancel()
         if (saveFile) {
             val amplitudeLogFilePath = audioRecorder.getAmplitudeLogFilePath()
+            stopEntriesPlaying()
             sendActionEvent(
                 HomeActionEvent.NavigateToEntryScreen(
                     Uri.encode(audioFilePath), Uri.encode(amplitudeLogFilePath)

@@ -13,7 +13,8 @@ data class EntryUiState(
     val playerState: PlayerState = PlayerState(),
     val currentTopics: List<Topic> = emptyList(),
     val foundTopics: List<Topic> = emptyList(),
-    val entrySheetState: EntrySheetState = EntrySheetState()
+    val entrySheetState: EntrySheetState = EntrySheetState(),
+    val showLeaveDialog: Boolean = false
 ) : UiState {
     val isSaveButtonEnabled: Boolean
         get() = titleValue.isNotBlank() && currentMood != MoodUiModel.Undefined

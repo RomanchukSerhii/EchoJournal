@@ -66,7 +66,7 @@ fun EntryBottomSheet(
 
                 EntryBottomButtons(
                     primaryButtonText = stringResource(R.string.confirm),
-                    onCancelClick = {},
+                    onCancelClick = { onEvent(EntryUiEvent.BottomSheetClosed) },
                     onConfirmClick = {
                         onEvent(EntryUiEvent.SheetConfirmedClicked(entrySheetState.activeMood))
                     },
