@@ -30,6 +30,7 @@ class AndroidAudioPlayer(
     private var isCurrentlyPlaying: Boolean = false
 
     override fun initializeFile(filePath: String) {
+        _currentPositionFlow.value = 0
         this.filePath = filePath
         createPlayer()
     }

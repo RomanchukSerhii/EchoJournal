@@ -15,7 +15,23 @@ import com.serhiiromanchuk.echojournal.presentation.core.utils.toMoodType
 import com.serhiiromanchuk.echojournal.presentation.core.utils.toMoodUiModel
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryActionEvent
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent
-import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.*
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.BottomSheetClosed
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.BottomSheetOpened
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.CreateTopicClicked
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.DescriptionValueChanged
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.LeaveDialogConfirmClicked
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.LeaveDialogToggled
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.MoodSelected
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.PauseClicked
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.PlayClicked
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.ResumeClicked
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.SaveButtonClicked
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.SheetConfirmedClicked
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.TagClearClicked
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.TitleValueChanged
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.TopicClicked
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.TopicValueChanged
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.TranscribeButtonClicked
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiState
 import com.serhiiromanchuk.echojournal.utils.Constants
 import com.serhiiromanchuk.echojournal.utils.InstantFormatter
@@ -117,6 +133,7 @@ class EntryViewModel @AssistedInject constructor(
             LeaveDialogToggled -> toggleLeaveDialog()
             LeaveDialogConfirmClicked -> {
                 toggleLeaveDialog()
+                audioPlayer.stop()
                 sendActionEvent(EntryActionEvent.NavigateBack)
             }
 
@@ -162,7 +179,6 @@ class EntryViewModel @AssistedInject constructor(
     private fun setupAudioPlayerListeners() {
         audioPlayer.setOnCompletionListener {
             updatePlayerStateAction(PlayerState.Action.Initializing)
-            audioPlayer.stop()
         }
     }
 
