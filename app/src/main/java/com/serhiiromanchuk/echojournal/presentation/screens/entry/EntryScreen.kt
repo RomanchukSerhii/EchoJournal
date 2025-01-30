@@ -3,6 +3,7 @@ package com.serhiiromanchuk.echojournal.presentation.screens.entry
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -40,9 +42,10 @@ import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.Ent
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.LeaveDialog
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.MoodChooseButton
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.TopicTagsRow
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.components.TranscribeButton
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryActionEvent
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent
-import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.state.EntryUiState
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiState
 
 @Composable
 fun EntryScreenRoot(
@@ -145,14 +148,30 @@ private fun EntryScreen(
                 iconSpacing = 6.dp
             )
 
-            MoodPlayer(
-                moodColor = uiState.currentMood.moodColor,
-                playerState = uiState.playerState,
-                onPlayClick = { onEvent(EntryUiEvent.PlayClicked) },
-                onPauseClick = { onEvent(EntryUiEvent.PauseClicked) },
-                onResumeClick = { onEvent(EntryUiEvent.ResumeClicked) },
-                modifier = Modifier.height(44.dp),
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                MoodPlayer(
+                    moodColor = uiState.currentMood.moodColor,
+                    playerState = uiState.playerState,
+                    onPlayClick = { onEvent(EntryUiEvent.PlayClicked) },
+                    onPauseClick = { onEvent(EntryUiEvent.PauseClicked) },
+                    onResumeClick = { onEvent(EntryUiEvent.ResumeClicked) },
+                    modifier = Modifier.height(44.dp).weight(1f),
+                )
+
+                TranscribeButton(
+                    onClick = {
+                        if (uiState.descriptionValue.isBlank()) {
+                            onEvent(EntryUiEvent.TranscribeButtonClicked)
+                        }
+                    },
+                    iconColor = uiState.currentMood.moodColor.button
+                )
+            }
+
 
             TopicTagsRow(
                 value = uiState.topicValue,

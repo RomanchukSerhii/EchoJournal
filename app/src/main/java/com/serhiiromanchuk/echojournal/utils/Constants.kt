@@ -13,4 +13,5 @@ object Constants {
     const val KEY_MOOD_SETTINGS = "mood_settings"
     const val KEY_TOPIC_SETTINGS = "topic_settings"
     const val KEY_WIDGET_INTENT = "from_widget"
+    const val API_KEY = "apiKey"
 }

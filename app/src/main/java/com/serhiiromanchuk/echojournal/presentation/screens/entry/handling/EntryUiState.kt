@@ -1,5 +1,6 @@
-package com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.state
+package com.serhiiromanchuk.echojournal.presentation.screens.entry.handling
 
+import androidx.compose.runtime.Stable
 import com.serhiiromanchuk.echojournal.domain.entity.Topic
 import com.serhiiromanchuk.echojournal.presentation.core.base.handling.UiState
 import com.serhiiromanchuk.echojournal.presentation.core.state.PlayerState
@@ -18,4 +19,11 @@ data class EntryUiState(
 ) : UiState {
     val isSaveButtonEnabled: Boolean
         get() = titleValue.isNotBlank() && currentMood != MoodUiModel.Undefined
+
+    @Stable
+    data class EntrySheetState (
+        val isOpen: Boolean = true,
+        val activeMood: MoodUiModel = MoodUiModel.Undefined,
+        val moods: List<MoodUiModel> = MoodUiModel.allMoods
+    )
 }

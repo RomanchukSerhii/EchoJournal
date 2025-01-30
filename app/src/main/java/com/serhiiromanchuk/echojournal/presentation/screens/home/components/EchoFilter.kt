@@ -96,10 +96,9 @@ private fun FilterChip(
         onClick = onClick,
         shape = RoundedCornerShape(50.dp),
         colors = AssistChipDefaults.assistChipColors(
-//            containerColor = if (isFilterSelected) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.background
             containerColor = when {
                 isFilterSelected -> MaterialTheme.colorScheme.surface
-                filterItems.isNotEmpty() -> MaterialTheme.colorScheme.surface
+                filterItems.isSomeMoodSelected() -> MaterialTheme.colorScheme.surface
                 else -> MaterialTheme.colorScheme.background
             }
         ),
@@ -117,8 +116,7 @@ private fun FilterChip(
             )
         },
         trailingIcon = {
-            val isSomeMoodSelected = filterItems.any { it.isChecked }
-            if (isSomeMoodSelected) {
+            if (filterItems.isSomeMoodSelected()) {
                 // Clear icon
                 IconButton(
                     modifier = Modifier.size(18.dp),
@@ -156,3 +154,5 @@ private fun getFormatFilterTitle(
         }
     }
 }
+
+private fun List<FilterState.FilterItem>.isSomeMoodSelected() = this.any { it.isChecked }

@@ -2,6 +2,7 @@ package com.serhiiromanchuk.echojournal.presentation.screens.entry
 
 import androidx.lifecycle.viewModelScope
 import com.serhiiromanchuk.echojournal.domain.audio.AudioPlayer
+import com.serhiiromanchuk.echojournal.domain.audio.AudioTranscription
 import com.serhiiromanchuk.echojournal.domain.entity.Entry
 import com.serhiiromanchuk.echojournal.domain.entity.Topic
 import com.serhiiromanchuk.echojournal.domain.repository.EntryRepository
@@ -15,8 +16,7 @@ import com.serhiiromanchuk.echojournal.presentation.core.utils.toMoodUiModel
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryActionEvent
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent.*
-import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.state.EntrySheetState
-import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.state.EntryUiState
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiState
 import com.serhiiromanchuk.echojournal.utils.Constants
 import com.serhiiromanchuk.echojournal.utils.InstantFormatter
 import dagger.assisted.Assisted
@@ -44,6 +44,7 @@ class EntryViewModel @AssistedInject constructor(
     private val entryRepository: EntryRepository,
     private val topicRepository: TopicRepository,
     private val audioPlayer: AudioPlayer,
+    private val audioTranscription: AudioTranscription,
     settingsRepository: SettingsRepository
 ) : EntryBaseViewModel() {
     override val initialState: EntryUiState
@@ -83,9 +84,16 @@ class EntryViewModel @AssistedInject constructor(
             BottomSheetClosed -> updateState {
                 it.copy(entrySheetState = toggleSheetState(currentState.entrySheetState))
             }
+
             is BottomSheetOpened -> updateState {
-                it.copy(entrySheetState = toggleSheetState(currentState.entrySheetState, event.mood))
+                it.copy(
+                    entrySheetState = toggleSheetState(
+                        currentState.entrySheetState,
+                        event.mood
+                    )
+                )
             }
+
             is SheetConfirmedClicked -> setCurrentMood(event.mood)
 
             is MoodSelected -> updateActiveMood(event.mood)
@@ -96,6 +104,7 @@ class EntryViewModel @AssistedInject constructor(
             is TagClearClicked -> updateState {
                 it.copy(currentTopics = currentState.currentTopics - event.topic)
             }
+
             is TopicClicked -> updateCurrentTopics(event.topic)
             CreateTopicClicked -> addNewTopic()
 
@@ -106,16 +115,80 @@ class EntryViewModel @AssistedInject constructor(
             is SaveButtonClicked -> saveEntry(event.outputDir)
 
             LeaveDialogToggled -> toggleLeaveDialog()
-            LeaveDialogConfirmClicked -> sendActionEvent(EntryActionEvent.NavigateBack)
+            LeaveDialogConfirmClicked -> {
+                toggleLeaveDialog()
+                sendActionEvent(EntryActionEvent.NavigateBack)
+            }
+
+
+            TranscribeButtonClicked -> transcribeAudio()
+        }
+    }
+
+    private fun initializeAudioPlayer() {
+        audioPlayer.initializeFile(audioFilePath)
+        updateState {
+            it.copy(
+                playerState = currentState.playerState.copy(
+                    duration = audioPlayer.getDuration(),
+                    amplitudeLogFilePath = amplitudeLogFilePath
+                )
+            )
+        }
+    }
+
+    private fun setupDefaultSettings() {
+        launch {
+            val defaultTopics = topicRepository.getTopicsByIdList(defaultTopicsId)
+            updateState {
+                it.copy(
+                    entrySheetState = currentState.entrySheetState.copy(
+                        activeMood = defaultMood.toMoodUiModel()
+                    ),
+                    currentTopics = defaultTopics
+                )
+            }
+        }
+    }
+
+    private fun subscribeToTopicSearchResults() {
+        launch {
+            searchResults.collect {
+                updateState { it.copy(foundTopics = searchResults.value) }
+            }
+        }
+    }
+
+    private fun setupAudioPlayerListeners() {
+        audioPlayer.setOnCompletionListener {
+            updatePlayerStateAction(PlayerState.Action.Initializing)
+            audioPlayer.stop()
+        }
+    }
+
+    private fun observeAudioPlayerCurrentPosition() {
+        launch {
+            audioPlayer.currentPositionFlow.collect { positionMillis ->
+                val currentPositionText =
+                    InstantFormatter.formatMillisToTime(positionMillis.toLong())
+                updateState {
+                    it.copy(
+                        playerState = currentState.playerState.copy(
+                            currentPosition = positionMillis,
+                            currentPositionText = currentPositionText
+                        )
+                    )
+                }
+            }
         }
     }
 
     private fun toggleSheetState(
-        state: EntrySheetState,
+        sheetState: EntryUiState.EntrySheetState,
         activeMood: MoodUiModel = MoodUiModel.Undefined
-    ): EntrySheetState {
-        return state.copy(
-            isOpen = !state.isOpen,
+    ): EntryUiState.EntrySheetState {
+        return sheetState.copy(
+            isOpen = !sheetState.isOpen,
             activeMood = activeMood
         )
     }
@@ -199,60 +272,14 @@ class EntryViewModel @AssistedInject constructor(
         updateState { it.copy(showLeaveDialog = !currentState.showLeaveDialog) }
     }
 
-    private fun initializeAudioPlayer() {
-        audioPlayer.initializeFile(audioFilePath)
-        updateState {
-            it.copy(
-                playerState = currentState.playerState.copy(
-                    duration = audioPlayer.getDuration(),
-                    amplitudeLogFilePath = amplitudeLogFilePath
-                )
-            )
-        }
-    }
-
-    private fun setupDefaultSettings() {
+    private fun transcribeAudio() {
         launch {
-            val defaultTopics = topicRepository.getTopicsByIdList(defaultTopicsId)
+            val transcribedText = audioTranscription.transcribeAudio(audioFilePath)
+
             updateState {
                 it.copy(
-                    entrySheetState = currentState.entrySheetState.copy(
-                        activeMood = defaultMood.toMoodUiModel()
-                    ),
-                    currentTopics = defaultTopics
+                    descriptionValue = transcribedText
                 )
-            }
-        }
-    }
-
-    private fun subscribeToTopicSearchResults() {
-        launch {
-            searchResults.collect {
-                updateState { it.copy(foundTopics = searchResults.value) }
-            }
-        }
-    }
-
-    private fun setupAudioPlayerListeners() {
-        audioPlayer.setOnCompletionListener {
-            updatePlayerStateAction(PlayerState.Action.Initializing)
-            audioPlayer.stop()
-        }
-    }
-
-    private fun observeAudioPlayerCurrentPosition() {
-        launch {
-            audioPlayer.currentPositionFlow.collect { positionMillis ->
-                val currentPositionText =
-                    InstantFormatter.formatMillisToTime(positionMillis.toLong())
-                updateState {
-                    it.copy(
-                        playerState = currentState.playerState.copy(
-                            currentPosition = positionMillis,
-                            currentPositionText = currentPositionText
-                        )
-                    )
-                }
             }
         }
     }

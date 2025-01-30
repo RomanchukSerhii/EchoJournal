@@ -25,11 +25,11 @@ import com.serhiiromanchuk.echojournal.R
 import com.serhiiromanchuk.echojournal.presentation.core.components.MoodsRow
 import com.serhiiromanchuk.echojournal.presentation.core.utils.MoodUiModel
 import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiEvent
-import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.state.EntrySheetState
+import com.serhiiromanchuk.echojournal.presentation.screens.entry.handling.EntryUiState
 
 @Composable
 fun EntryBottomSheet(
-    entrySheetState: EntrySheetState,
+    entrySheetState: EntryUiState.EntrySheetState,
     onEvent: (EntryUiEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {

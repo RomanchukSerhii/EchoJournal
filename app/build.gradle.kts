@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -18,6 +21,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "GROQ", "\"${getLocalProperty("groq")}\"")
     }
 
     buildTypes {
@@ -27,6 +31,11 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        create("profile") {
+            initWith(getByName("debug"))
+            isDebuggable = false
+            isProfileable = true
         }
     }
     compileOptions {
@@ -38,6 +47,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -87,4 +97,19 @@ dependencies {
     // Glance
     implementation(libs.androidx.glance.material3)
     implementation(libs.androidx.glance.appwidget)
+
+    // Groq
+    implementation(libs.ktor.client.android)
+    implementation(libs.ktor.client.core)
+    implementation(libs.groq)
+}
+
+fun getLocalProperty(key: String): String {
+    val localProperties = Properties().apply {
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            load(FileInputStream(localPropertiesFile))
+        }
+    }
+    return localProperties.getProperty(key) ?: ""
 }

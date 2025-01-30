@@ -30,11 +30,11 @@ fun AudioWaveform(
     playbackPosition: Int,
     totalDuration: Int,
     modifier: Modifier = Modifier,
-    amplitudeWidth: Dp = 4.5.dp,
+    amplitudeWidth: Dp = 4.dp,
     amplitudeSpacing: Dp = 2.5.dp,
     colorPlayed: Color = MoodUiModel.Undefined.moodColor.button,
     colorRemaining: Color = MoodUiModel.Undefined.moodColor.track,
-    maxAmplitudeHeight: Dp = 16.dp
+    maxAmplitudeHeight: Dp = 18.dp
 ) {
     val density = LocalDensity.current
     var totalWidth by remember { mutableFloatStateOf(0f) }
