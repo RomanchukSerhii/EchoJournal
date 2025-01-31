@@ -97,19 +97,8 @@ class EntryViewModel @AssistedInject constructor(
 
     override fun onEvent(event: EntryUiEvent) {
         when (event) {
-            BottomSheetClosed -> updateState {
-                it.copy(entrySheetState = toggleSheetState(currentState.entrySheetState))
-            }
-
-            is BottomSheetOpened -> updateState {
-                it.copy(
-                    entrySheetState = toggleSheetState(
-                        currentState.entrySheetState,
-                        event.mood
-                    )
-                )
-            }
-
+            BottomSheetClosed -> toggleSheetState()
+            is BottomSheetOpened -> toggleSheetState(event.mood)
             is SheetConfirmedClicked -> setCurrentMood(event.mood)
 
             is MoodSelected -> updateActiveMood(event.mood)
@@ -136,7 +125,6 @@ class EntryViewModel @AssistedInject constructor(
                 audioPlayer.stop()
                 sendActionEvent(EntryActionEvent.NavigateBack)
             }
-
 
             TranscribeButtonClicked -> transcribeAudio()
         }
@@ -199,23 +187,18 @@ class EntryViewModel @AssistedInject constructor(
         }
     }
 
-    private fun toggleSheetState(
-        sheetState: EntryUiState.EntrySheetState,
-        activeMood: MoodUiModel = MoodUiModel.Undefined
-    ): EntryUiState.EntrySheetState {
-        return sheetState.copy(
-            isOpen = !sheetState.isOpen,
-            activeMood = activeMood
-        )
+    private fun toggleSheetState(activeMood: MoodUiModel = MoodUiModel.Undefined) {
+        updateSheetState {
+            it.copy(
+                isOpen = !it.isOpen,
+                activeMood = activeMood
+            )
+        }
     }
 
     private fun setCurrentMood(mood: MoodUiModel) {
-        updateState {
-            it.copy(
-                currentMood = mood,
-                entrySheetState = toggleSheetState(currentState.entrySheetState)
-            )
-        }
+        updateState { it.copy(currentMood = mood) }
+        toggleSheetState()
     }
 
     private fun updateActiveMood(mood: MoodUiModel) {
@@ -298,6 +281,10 @@ class EntryViewModel @AssistedInject constructor(
                 )
             }
         }
+    }
+
+    private fun updateSheetState(update: (EntryUiState.EntrySheetState) -> EntryUiState.EntrySheetState) {
+        updateState { it.copy(entrySheetState = update(it.entrySheetState)) }
     }
 
     private fun updatePlayerStateAction(action: PlayerState.Action) {
