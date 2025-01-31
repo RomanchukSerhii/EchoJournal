@@ -56,24 +56,9 @@ class SettingsViewModel @Inject constructor(
         )
 
     init {
-        // Set default settings
         launch {
-            val defaultTopics = topicRepository.getTopicsByIdList(defaultTopicsId)
-            updateState {
-                it.copy(
-                    activeMood = defaultMood.toMoodUiModel(),
-                    topicState = currentState.topicState.copy(currentTopics = defaultTopics),
-                )
-            }
-        }
-
-        // Subscribe to topic search results
-        launch {
-            searchResults.collect {
-                updateTopicState {
-                    it.copy(foundTopics = searchResults.value)
-                }
-            }
+            initializeDefaultSettings()
+            observeTopicSearchResults()
         }
     }
 
@@ -85,6 +70,24 @@ class SettingsViewModel @Inject constructor(
             CreateTopicClicked -> addNewTopic()
             AddButtonVisibleToggled -> toggleAddButtonVisibility()
             is MoodSelected -> selectMood(event.mood)
+        }
+    }
+
+    private suspend fun initializeDefaultSettings() {
+        val defaultTopics = topicRepository.getTopicsByIdList(defaultTopicsId)
+        updateState {
+            it.copy(
+                activeMood = defaultMood.toMoodUiModel(),
+                topicState = currentState.topicState.copy(currentTopics = defaultTopics)
+            )
+        }
+    }
+
+    private suspend fun observeTopicSearchResults() {
+        searchResults.collect {
+            updateTopicState {
+                it.copy(foundTopics = searchResults.value)
+            }
         }
     }
 
