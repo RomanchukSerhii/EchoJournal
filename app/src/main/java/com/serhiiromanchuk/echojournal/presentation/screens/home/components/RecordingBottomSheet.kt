@@ -40,11 +40,11 @@ import androidx.compose.ui.unit.dp
 import com.serhiiromanchuk.echojournal.R
 import com.serhiiromanchuk.echojournal.presentation.core.utils.GradientScheme
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent
-import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.HomeSheetState
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiState
 
 @Composable
 fun RecordingBottomSheet(
-    homeSheetState: HomeSheetState,
+    homeSheetState: HomeUiState.HomeSheetState,
     onEvent: (HomeUiEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {

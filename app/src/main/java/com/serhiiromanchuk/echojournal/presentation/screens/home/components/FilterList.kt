@@ -32,11 +32,11 @@ import androidx.compose.ui.unit.dp
 import com.serhiiromanchuk.echojournal.R
 import com.serhiiromanchuk.echojournal.presentation.core.utils.MoodUiModel
 import com.serhiiromanchuk.echojournal.presentation.core.utils.toMoodUiModel
-import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.FilterState.FilterItem
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiState.*
 
 @Composable
 fun FilterList(
-    filterItems: List<FilterItem>,
+    filterItems: List<FilterState.FilterItem>,
     onItemClick: (String) -> Unit,
     onDismissClicked: () -> Unit,
     modifier: Modifier = Modifier,
@@ -78,7 +78,7 @@ fun FilterList(
 
 @Composable
 private fun FilterItem(
-    filterItem: FilterItem,
+    filterItem: FilterState.FilterItem,
     onClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {

@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.serhiiromanchuk.echojournal.R
 import com.serhiiromanchuk.echojournal.presentation.core.utils.toMoodUiModel
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent
-import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.FilterState
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiState.FilterState
 
 @Composable
 fun EchoFilter(
@@ -48,20 +48,9 @@ fun EchoFilter(
                     onClearClick = { onEvent(HomeUiEvent.MoodsFilterClearClicked) },
                     leadingIcon = {
                         if (filterState.moodFilterItems.isNotEmpty()) {
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy((-4).dp)
-                            ) {
-                                filterState.moodFilterItems.forEach { filterItem ->
-                                    if (filterItem.isChecked) {
-                                        val mood = filterItem.title.toMoodUiModel()
-                                        Image(
-                                            modifier = Modifier.height(22.dp),
-                                            painter = painterResource(mood.moodIcons.stroke),
-                                            contentDescription = null
-                                        )
-                                    }
-                                }
-                            }
+                            SelectedMoodIcons(
+                                moodFilterItems = filterState.moodFilterItems
+                            )
                         }
                     }
                 )
@@ -75,6 +64,28 @@ fun EchoFilter(
                     isFilterSelected = filterState.isTopicsOpen,
                     onClick = { onEvent(HomeUiEvent.TopicsFilterToggled) },
                     onClearClick = { onEvent(HomeUiEvent.TopicsFilterClearClicked) },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun SelectedMoodIcons(
+    moodFilterItems: List<FilterState.FilterItem>,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy((-4).dp)
+    ) {
+        moodFilterItems.forEach { filterItem ->
+            if (filterItem.isChecked) {
+                val mood = filterItem.title.toMoodUiModel()
+                Image(
+                    modifier = Modifier.height(22.dp),
+                    painter = painterResource(mood.moodIcons.stroke),
+                    contentDescription = null
                 )
             }
         }

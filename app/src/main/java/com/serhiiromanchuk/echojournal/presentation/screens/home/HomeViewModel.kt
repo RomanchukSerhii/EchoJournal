@@ -29,10 +29,10 @@ import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUi
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.TopicFilterItemClicked
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.TopicsFilterClearClicked
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent.TopicsFilterToggled
-import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.FilterState
-import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.HomeSheetState
-import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.HomeUiState
-import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.HomeUiState.EntryHolderState
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiState
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiState.EntryHolderState
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiState.FilterState
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiState.HomeSheetState
 import com.serhiiromanchuk.echojournal.utils.InstantFormatter
 import com.serhiiromanchuk.echojournal.utils.StopWatch
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -89,7 +89,6 @@ class HomeViewModel @Inject constructor(
                 toggleSheetState()
                 startRecording()
             }
-
             PauseRecording -> pauseRecording()
             ResumeRecording -> resumeRecording()
             is StopRecording -> {

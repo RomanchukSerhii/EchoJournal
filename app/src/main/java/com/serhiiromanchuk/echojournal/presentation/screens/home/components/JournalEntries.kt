@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent
-import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.HomeUiState.*
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiState.*
 import com.serhiiromanchuk.echojournal.utils.InstantFormatter
 import java.time.Instant
 

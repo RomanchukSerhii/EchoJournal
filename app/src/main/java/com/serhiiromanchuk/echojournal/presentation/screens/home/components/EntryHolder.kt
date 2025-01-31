@@ -51,7 +51,7 @@ import com.serhiiromanchuk.echojournal.presentation.core.components.ExpandableTe
 import com.serhiiromanchuk.echojournal.presentation.core.components.MoodPlayer
 import com.serhiiromanchuk.echojournal.presentation.core.utils.toUiModel
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent
-import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.HomeUiState.EntryHolderState
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiState.EntryHolderState
 import com.serhiiromanchuk.echojournal.presentation.theme.EchoUltraLightGray
 import com.serhiiromanchuk.echojournal.utils.InstantFormatter
 

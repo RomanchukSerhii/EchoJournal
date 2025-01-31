@@ -27,7 +27,7 @@ import com.serhiiromanchuk.echojournal.presentation.screens.home.components.Jour
 import com.serhiiromanchuk.echojournal.presentation.screens.home.components.RecordingBottomSheet
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeActionEvent
 import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiEvent
-import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.state.HomeUiState
+import com.serhiiromanchuk.echojournal.presentation.screens.home.handling.HomeUiState
 
 @Composable
 fun HomeScreenRoot(
@@ -80,7 +80,6 @@ fun HomeScreenRoot(
             }
         }
     ) { uiState ->
-
         if (uiState.entries.isEmpty()  && !uiState.isFilterActive) {
             EmptyHomeScreen(modifier = Modifier.padding(16.dp))
         } else {
@@ -89,6 +88,7 @@ fun HomeScreenRoot(
                 onEvent = viewModel::onEvent
             )
         }
+
         RecordingBottomSheet(
             homeSheetState = uiState.homeSheetState,
             onEvent = viewModel::onEvent
@@ -102,6 +102,7 @@ private fun HomeScreen(
     onEvent: (HomeUiEvent) -> Unit
 ) {
     var filterOffset by remember { mutableStateOf(IntOffset.Zero) }
+
     Column {
         EchoFilter(
             filterState = uiState.filterState,
