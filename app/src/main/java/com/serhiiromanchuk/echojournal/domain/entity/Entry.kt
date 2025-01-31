@@ -13,6 +13,6 @@ data class Entry(
     val audioDuration: Int,
     val amplitudeLogFilePath: String,
     val description: String = "",
-    val topics: List<String> = listOf(),
+    val topics: List<String> = emptyList(),
     val creationTimestamp: Instant = Instant.now()
 )

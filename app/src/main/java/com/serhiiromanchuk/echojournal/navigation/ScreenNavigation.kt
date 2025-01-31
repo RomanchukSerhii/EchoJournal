@@ -25,8 +25,8 @@ fun NavGraphBuilder.homeRoute(
 }
 
 fun NavGraphBuilder.entryRoute(
-    modifier: Modifier,
-    navigationState: NavigationState
+    navigationState: NavigationState,
+    modifier: Modifier
 ) {
     composable(
         route = Screen.Entry.routeWithArgs,
@@ -47,8 +47,8 @@ fun NavGraphBuilder.entryRoute(
 }
 
 fun NavGraphBuilder.settingsRoute(
-    modifier: Modifier = Modifier,
-    navigationState: NavigationState
+    navigationState: NavigationState,
+    modifier: Modifier = Modifier
 ) {
     composable(route = Screen.Settings.route) {
         SettingsScreenRoot(

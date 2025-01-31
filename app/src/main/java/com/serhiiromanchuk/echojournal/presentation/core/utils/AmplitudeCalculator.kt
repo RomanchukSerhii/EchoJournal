@@ -20,13 +20,13 @@ class AmplitudeCalculator(
         if (amplitudeList.isEmpty()) return List(barCount) { 0f }
 
         return if (amplitudeList.size >= barCount) {
-            // Якщо амплітуд більше або дорівнює кількості барів, використовуємо агрегацію
+            // If the amplitude is greater than or equal to the number of bars, we use aggregation
             val segmentSize = amplitudeList.size / barCount
             amplitudeList.chunked(segmentSize) { segment ->
                 segment.average().toFloat()
             }.take(barCount)
         } else {
-            // Якщо амплітуд менше, використовуємо інтерполяцію
+            // If the amplitude is smaller, use interpolation
             interpolateAmplitudes(amplitudeList, barCount)
         }
     }

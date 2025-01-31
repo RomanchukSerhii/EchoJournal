@@ -22,12 +22,12 @@ fun RootAppNavigation(
             modifier = modifier
         )
         entryRoute(
-            modifier = modifier,
-            navigationState = navigationState
+            navigationState = navigationState,
+            modifier = modifier
         )
         settingsRoute(
-            modifier = modifier,
-            navigationState = navigationState
+            navigationState = navigationState,
+            modifier = modifier
         )
     }
 }
