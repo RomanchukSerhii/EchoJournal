@@ -16,6 +16,9 @@ import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
+// FEEDBACK: Be careful of over-engineering. A Base class is rarely needed and
+// couples all ViewModels together. A Change in the BaseViewModel will affect all ViewModels
+// Introduces addition layers to click through which, for an app of this scale, makes it harder to navigate
 abstract class BaseViewModel<S : UiState, E : UiEvent, A : ActionEvent> : ViewModel() {
     protected abstract val initialState: S
 
@@ -36,6 +39,8 @@ abstract class BaseViewModel<S : UiState, E : UiEvent, A : ActionEvent> : ViewMo
         viewModelScope.launch { _actionEvent.send(actionEvent) }
     }
 
+    // FEEDBACK: Using this inside a VM would be confusing since the dev would
+    // need to click in here to ths scope used is the viewModelScope
     protected fun launch(
         context: CoroutineContext = EmptyCoroutineContext,
         block: suspend CoroutineScope.() -> Unit

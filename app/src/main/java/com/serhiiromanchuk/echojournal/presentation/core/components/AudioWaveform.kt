@@ -41,8 +41,10 @@ fun AudioWaveform(
     var correctedSpacing by remember { mutableFloatStateOf(0f) }
     var amplitudeHeightCoefficients by remember { mutableStateOf(listOf<Float>()) }
 
+    // FEEDBACK: Property can be managed by VM to avoid side effect
     LaunchedEffect(totalWidth) {
         if (totalWidth > 0) {
+            // FEEDBACK: Logic does not belong in UI
             val amplitudeCalculator = AmplitudeCalculator(
                 amplitudeLogFilePath = amplitudeLogFilePath,
                 trackWidth = totalWidth,
