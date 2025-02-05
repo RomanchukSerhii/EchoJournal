@@ -66,6 +66,8 @@ class HomeViewModel @Inject constructor(
 
     private var playingEntryId = MutableStateFlow<Long?>(null)
 
+    // FEEDBACK: Opt to use .onStart{} on screen state to trigger setup logic
+    // Makes VM easier to test
     init {
         observeEntries()
         observeFilters()

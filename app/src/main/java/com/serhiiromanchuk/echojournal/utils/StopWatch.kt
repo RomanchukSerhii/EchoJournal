@@ -13,6 +13,7 @@ class StopWatch {
     private val _formattedTime = MutableStateFlow(Constants.DEFAULT_FORMATTED_TIME)
     val formattedTime: StateFlow<String> = _formattedTime
 
+    // FEEDBACK: Inject scope for testability
     private var coroutineScope = CoroutineScope(Dispatchers.Main)
     private var isRunning = false
 
@@ -40,6 +41,7 @@ class StopWatch {
 
     fun reset() {
         coroutineScope.cancel()
+        // FEEDBACK: Redundant initialisation of scope
         coroutineScope = CoroutineScope(Dispatchers.Main)
         timeMillis = 0L
         lastTimestamp = 0L

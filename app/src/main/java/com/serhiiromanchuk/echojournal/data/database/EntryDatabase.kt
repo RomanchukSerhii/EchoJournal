@@ -8,6 +8,7 @@ import com.serhiiromanchuk.echojournal.data.converter.MoodTypeConverter
 import com.serhiiromanchuk.echojournal.data.converter.TopicsConverter
 import com.serhiiromanchuk.echojournal.data.entity.EntryDb
 
+// FEEDBACK: Usage of two databases in app
 @Database(entities = [EntryDb::class], version = 1, exportSchema = false)
 @TypeConverters(MoodTypeConverter::class, TopicsConverter::class, InstantConverter::class)
 abstract class EntryDatabase : RoomDatabase() {

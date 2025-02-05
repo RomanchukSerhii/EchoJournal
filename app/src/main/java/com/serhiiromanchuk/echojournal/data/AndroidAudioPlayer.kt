@@ -98,6 +98,7 @@ class AndroidAudioPlayer(
         checkPlayerReady()
         stopUpdatingCurrentPosition()
 
+        // FEEDBACK: Inject scope for testability
         updateJob = CoroutineScope(Dispatchers.IO).launch {
             while (player != null && player?.isPlaying == true) {
                 _currentPositionFlow.value = player?.currentPosition ?: 0

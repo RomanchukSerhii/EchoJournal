@@ -131,6 +131,9 @@ class SettingsViewModel @Inject constructor(
         saveTopicsSettings()
     }
 
+    // FEEDBACK: Bug when creating a new topic, it won't appear as a default tag
+    // The new topic is created, but not set as a default tag
+    // Trying to add it a 2nd time, it will appear as an existing tag and be added successfully
     private fun addNewTopic() {
         val newTopic = Topic(name = currentState.topicState.topicValue)
         updateCurrentTopics(newTopic)

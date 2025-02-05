@@ -231,6 +231,8 @@ class EntryViewModel @AssistedInject constructor(
         }
     }
 
+    // FEEDBACK: Cleanup resources when navigating away from screen
+    // Current implementation will keep playing audio after saving an entry
     private fun playAudio() {
         updatePlayerStateAction(PlayerState.Action.Playing)
         audioPlayer.play()

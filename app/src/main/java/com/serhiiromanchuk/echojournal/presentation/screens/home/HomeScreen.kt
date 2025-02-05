@@ -50,6 +50,7 @@ fun HomeScreenRoot(
             )
         },
         floatingActionButton = {
+            // FEEDBACK: No check done for any audio playing to stop before recording new audio
             HomeFAB(
                 onResult = { isGranted, isLongClicked ->
                     if (isGranted) {
@@ -75,6 +76,8 @@ fun HomeScreenRoot(
 
                 HomeActionEvent.DataLoaded -> {
                     isDataLoaded()
+                    // FEEDBACK: No permission check done when launching app from widget
+                    // App will crash if audio capture permission not granted
                     if (isLaunchedFromWidget) viewModel.onEvent(HomeUiEvent.StartRecording)
                 }
             }

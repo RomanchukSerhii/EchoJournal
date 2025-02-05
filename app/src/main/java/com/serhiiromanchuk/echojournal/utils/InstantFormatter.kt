@@ -1,3 +1,4 @@
+// FEEDBACK: Do not use a root or core /utils package
 package com.serhiiromanchuk.echojournal.utils
 
 import java.time.Instant

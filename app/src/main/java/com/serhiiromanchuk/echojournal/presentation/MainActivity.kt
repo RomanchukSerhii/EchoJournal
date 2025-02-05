@@ -30,6 +30,7 @@ class MainActivity : ComponentActivity() {
 
         val fromWidget = intent.getBooleanExtra(Constants.KEY_WIDGET_INTENT, false)
 
+        // FEEDBACK: Logic does not belong in presentation layer
         CoroutineScope(Dispatchers.IO).launch {
             deleteTempFiles(this@MainActivity)
         }
